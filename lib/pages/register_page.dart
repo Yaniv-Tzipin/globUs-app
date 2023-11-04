@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
+import 'package:myfirstapp/pages/damo_page.dart';
 import 'package:myfirstapp/services/auth_service.dart';
 
 
@@ -28,6 +29,13 @@ class _RegisterState extends State<RegisterPage> {
   //sign user up method
   void signUserUp() async{
 
+    // try creating the user
+
+    if(passwordController.text != confirmPasswordController.text){
+      showErrorMessage("passwords don't match");
+    }
+    else{
+
     // show sign up circle 
     showDialog(
       context: context,
@@ -37,24 +45,19 @@ class _RegisterState extends State<RegisterPage> {
         );
        }
       );
-    // try creating the user
+    
     try{
     // check if password is confirmed
-    if(passwordController.text == confirmPasswordController.text){
+    
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: mailController.text,
       password: passwordController.text
       );
-    }
-    else{
-      //show error message, passwords don't match
-      showErrorMessage("passwords don't match");
-
-    }
-
-
     //pop the loading circle
     Navigator.pop(context);
+    
+
+
     } on FirebaseAuthException catch (e){
 
     //pop the loading circle
@@ -63,7 +66,7 @@ class _RegisterState extends State<RegisterPage> {
     showErrorMessage(e.code);
     
     }
-  
+  }
   }
 
 

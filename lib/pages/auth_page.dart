@@ -1,11 +1,13 @@
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:myfirstapp/pages/damo_page.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart";
-import "package:myfirstapp/pages/login_page.dart";
 import "package:myfirstapp/pages/home_page.dart";
+import "package:myfirstapp/pages/login_page.dart";
 
 class AuthPage extends StatelessWidget{
   const AuthPage({super.key});
+  
   
   @override
   Widget build(BuildContext context) {
@@ -14,10 +16,9 @@ class AuthPage extends StatelessWidget{
         stream: FirebaseAuth.instance.authStateChanges(), 
         builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
           // user logged in
-          if(snapshot.hasData){
+          if(snapshot.hasData){ //to change to profile full set-up
             return HomePage();
           }
-
           // user not logged in
           else{
             return const LoginOrRegisterPage();
