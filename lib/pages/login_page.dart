@@ -137,6 +137,8 @@ class _LoginPageState extends State<LoginPage> {
                   controller: mailController,
                   hintText: 'Email',
                   obscureText: false,
+                  maximumLines: 1,
+                  prefixIcon: Icons.mail,
                 ),
                 SizedBox(height: 10),
                   
@@ -145,6 +147,8 @@ class _LoginPageState extends State<LoginPage> {
                   controller: passwordController,
                   hintText: 'password',
                   obscureText: true,
+                  maximumLines: 1,
+                  prefixIcon: Icons.lock,
                 ), 
                 SizedBox(height: 10),
                 

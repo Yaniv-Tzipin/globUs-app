@@ -10,53 +10,47 @@ class MyDatePicker extends StatefulWidget {
 }
 
 class _MyDatePickerState extends State<MyDatePicker> {
-  
   TextEditingController _dateController = TextEditingController();
 
-  Future<void> _selectDate() async{
-    DateTime? _picked =
-      await showDatePicker(
-      context: context,
-      initialDate: DateTime(2006),
-      firstDate: DateTime(1925),
-      lastDate: DateTime(2006)
-      );
+  Future<void> _selectDate() async {
+    DateTime? _picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime(2006),
+        firstDate: DateTime(1925),
+        lastDate: DateTime(2006));
 
-      if(_picked != null){
-        setState(() {
-          _dateController.text = _picked.toString().split(" ")[0];
-        });
-      }
+    if (_picked != null) {
+      setState(() {
+        _dateController.text = _picked.toString().split(" ")[0];
+      });
     }
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialButton(
       onPressed: _selectDate,
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: TextField(
-          controller:  _dateController,
-          style: TextStyle(color: Colors.white),
+          controller: _dateController,
+          style: TextStyle(color: Color.fromARGB(255, 176, 175, 171)),
           decoration: InputDecoration(
-            labelText: 'Birth date',
-            labelStyle: const TextStyle(color: Colors.white,
-            fontWeight: FontWeight.bold),
-            filled: true,
-            prefixIcon: const Icon(Icons.calendar_today),
-            prefixIconColor: Colors.white,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none
-            ),
-            focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
-            )
-          ),
+              hintText: 'Birth date',
+              hintStyle: const TextStyle(
+                  color: Color.fromARGB(255, 176, 175, 171)),
+              filled: true,
+              fillColor: Color.fromARGB(255, 245, 249, 244),
+              prefixIcon: const Icon(Icons.calendar_today),
+              prefixIconColor: Color.fromARGB(255, 176, 175, 171),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
+              )),
           readOnly: true,
         ),
-    
       ),
     );
   }

@@ -6,11 +6,14 @@ class MyTextField extends StatelessWidget{
   final controller;
   final String hintText;
   final bool obscureText;
+  final int maximumLines;
+  final IconData prefixIcon;
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
-    required this.obscureText
+    required this.obscureText,
+    required this.maximumLines, required this.prefixIcon
     });
   
   @override
@@ -20,7 +23,11 @@ class MyTextField extends StatelessWidget{
                 child: TextField(
                   controller: controller,
                   obscureText: obscureText,
+                  minLines: 1,
+                  maxLines: maximumLines,
                   decoration: InputDecoration(
+                    prefixIcon: Icon(prefixIcon),
+                    prefixIconColor:  Color.fromARGB(255, 176, 175, 171),
                     enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -29,7 +36,7 @@ class MyTextField extends StatelessWidget{
                     fillColor: Color.fromARGB(255, 245, 249, 244),
                     filled: true,
                     hintText: hintText,
-                    hintStyle: TextStyle(color: Color.fromARGB(255, 176, 175, 171))
+                    hintStyle: TextStyle(color: Color.fromARGB(255, 176, 175, 171)),
                   ),
                 ),
               );
