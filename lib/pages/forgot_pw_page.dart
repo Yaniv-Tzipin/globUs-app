@@ -23,7 +23,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailcontroller.text.trim());
       // ignore: use_build_context_synchronously
       showDialog(context: context, builder: (context){
-        return AlertDialog(content:
+        return const AlertDialog(content:
         Text("Password reset link sent! Check your Email",
         textAlign: TextAlign.center,
         )
