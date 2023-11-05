@@ -22,17 +22,16 @@ class ContinueRegister extends StatefulWidget {
 class _ContinueRegisterState extends State<ContinueRegister> {
 
   final userNameController = TextEditingController();
+  final myBioController = TextEditingController();
 
   //sign user up method
   void signUserUp() async{
 
-    // check if password is confirmed
-
+    // check if passwords are matching
     if(widget.userPassword != widget.userConfirmPassword){
       showErrorMessage("passwords don't match");
     }
     else{
-
     // show sign up circle 
     showDialog(
       context: context,
@@ -52,6 +51,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
       );
     //pop the loading circle
     Navigator.pop(context);
+
     addUserDetails(widget.userMail.trim());
 
      //go to home-page
@@ -71,7 +71,8 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   Future addUserDetails(String email) async{
     await FirebaseFirestore.instance.collection('users').add({
       'email': email,
-      'user_name': userNameController.text.trim()
+      'username': userNameController.text.trim(),
+      // to add fields
     }
     );
   }
@@ -110,14 +111,26 @@ class _ContinueRegisterState extends State<ContinueRegister> {
         children: [
         MyTextField(
               controller: userNameController,
-              hintText: 'User Name',
+              hintText: 'Username',
               obscureText: false,
+              maximumLines: 1,
+              prefixIcon: Icons.person,
+
             ),
           const SizedBox(height: 10),
            MyDatePicker(),   
           const SizedBox(height: 10),
+          MyTextField(
+          controller: myBioController,
+           hintText: 'Tell about youself',
+           maximumLines: 5,
+            obscureText: false,
+            prefixIcon: Icons.face,),
+          const SizedBox(height: 10),
           MyButton(onTap: signUserUp,
            text: "Sign Up"),
+           const SizedBox(height: 10),
+           
         ],
         )
       ),

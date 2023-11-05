@@ -19,6 +19,7 @@ signInWithGoogle() async {
 
   //finally, lets sign in
   return await FirebaseAuth.instance.signInWithCredential(credential);
+  
 
 
 }
