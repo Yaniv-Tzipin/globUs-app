@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
+import 'package:myfirstapp/pages/continue_register.dart';
 import 'package:myfirstapp/services/auth_service.dart';
 
 
@@ -26,72 +27,15 @@ class _RegisterState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  //sign user up method
-  void signUserUp() async{
-
-    // try creating the user
-
-    if(passwordController.text != confirmPasswordController.text){
-      showErrorMessage("passwords don't match");
-    }
-    else{
-
-    // show sign up circle 
-    showDialog(
-      context: context,
-       builder: (context){
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-       }
-      );
-    
-    try{
-    // check if password is confirmed
-    
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: mailController.text,
-      password: passwordController.text
-      );
-    //pop the loading circle
-    Navigator.pop(context);
-    addUserDetails(mailController.text.trim());
-
-    } on FirebaseAuthException catch (e){
-
-    //pop the loading circle
-    Navigator.pop(context);
-      
-    showErrorMessage(e.code);
-    
-    }
-  }
-  }
-
-  Future addUserDetails(String email) async{
-    await FirebaseFirestore.instance.collection('users').add({
-      'email': email
-    }
+  void continueRegister(){
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>
+    ContinueRegister(userMail: mailController.text,
+    userPassword:passwordController.text,
+    userConfirmPassword: confirmPasswordController.text,)
+    )
     );
   }
-
-
-  void showErrorMessage(String message){
-    showDialog(context: context,
-     builder: (context)
-     {
-      return AlertDialog(
-        backgroundColor: Color.fromARGB(255, 110, 138, 100),
-        title: Center(
-          child: Text(message,
-          style: TextStyle(color: Colors.white)
-          )
-        )
-      );
-
-     }
-     );
-  }
+    
 
   @override
   Widget build(BuildContext context) {
@@ -148,11 +92,11 @@ class _RegisterState extends State<RegisterPage> {
           
                 SizedBox(height: 25),
                 
-                //sign in button
+                //sign up button
           
                 MyButton(
-                  onTap: signUserUp,
-                  text: 'Sign Up'
+                  onTap: continueRegister,
+                  text: 'Continue'
                 ),
           
                 SizedBox(height: 50),
