@@ -1,12 +1,17 @@
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:myfirstapp/pages/continue_register.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart";
 import "package:myfirstapp/pages/home_page.dart";
+import "package:myfirstapp/pages/login_page.dart";
+import "package:myfirstapp/pages/register_page.dart";
+
+import "package:myfirstapp/queries/completed_sign_in_queries.dart";
 
 class AuthPage extends StatelessWidget{
   const AuthPage({super.key});
   
-  
+
   @override
   Widget build(BuildContext context) {
 

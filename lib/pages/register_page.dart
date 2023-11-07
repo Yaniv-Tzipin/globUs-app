@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
+import 'package:myfirstapp/pages/continue_register.dart' as CR;
 import 'package:myfirstapp/pages/continue_register.dart';
 import 'package:myfirstapp/services/auth_service.dart';
 
@@ -23,7 +24,11 @@ class _RegisterState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  void continueRegister() {
+   continueRegister(bool withGoogle) async{
+    if (withGoogle)
+    {
+        await AuthService().signInWithGoogle();
+    }
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -31,11 +36,13 @@ class _RegisterState extends State<RegisterPage> {
                   userMail: mailController.text,
                   userPassword: passwordController.text,
                   userConfirmPassword: confirmPasswordController.text,
+                  withGoogle: withGoogle
                 )));
   }
 
   @override
   Widget build(BuildContext context) {
+    print("arrived");
     return Scaffold(
         backgroundColor: Color.fromARGB(225, 220, 232, 220),
         body: SafeArea(
@@ -95,7 +102,7 @@ class _RegisterState extends State<RegisterPage> {
 
                   //sign up button
 
-                  MyButton(onTap: continueRegister, text: 'Continue'),
+                  MyButton(onTap: () => continueRegister(false), text: 'Continue'),
 
                   SizedBox(height: 50),
 
@@ -136,7 +143,7 @@ class _RegisterState extends State<RegisterPage> {
                     children: [
                       // google button
                       SquareTitle(
-                          onTap: () => AuthService().signInWithGoogle(),
+                          onTap: () => continueRegister(true),
                           imagePath: 'lib/images/google.png'),
                       SizedBox(width: 25),
 
