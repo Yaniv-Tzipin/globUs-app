@@ -18,6 +18,7 @@ signInWithGoogle() async {
     accessToken: gAuth.accessToken,
     idToken: gAuth.idToken
   );
+
   //finally, lets sign in
    return await FirebaseAuth.instance.signInWithCredential(credential);
 

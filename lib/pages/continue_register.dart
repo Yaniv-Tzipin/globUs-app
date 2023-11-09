@@ -1,13 +1,14 @@
-import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:myfirstapp/components/my_alert_dialog.dart";
 import "package:myfirstapp/components/my_button.dart";
 import "package:myfirstapp/components/my_date_picker.dart";
 import "package:myfirstapp/components/my_textfield.dart";
-import "package:myfirstapp/services/auth_service.dart";
-import "package:myfirstapp/queries/completed_sign_in_queries.dart"
-    as completedSignInQueries;
+import "package:myfirstapp/pages/home_page.dart";
+import "package:myfirstapp/queries/completed_sign_in_queries.dart" as queries;
 import "package:myfirstapp/queries/users_queries.dart" as usersQueries;
+import 'package:myfirstapp/validations/continue_register_page_validations.dart'
+    as cvld;
 
 class ContinueRegister extends StatefulWidget {
   final String userMail;
@@ -32,22 +33,23 @@ class _ContinueRegisterState extends State<ContinueRegister> {
 
   //sign user up
   void signUserUp() async {
-    //sign user up method with google
-    if (widget.withGoogle) {
-      String email = FirebaseAuth.instance.currentUser?.email ?? "";
-      // adding a new user to Users Collection
-      await usersQueries.addNewUser(email, usernameController.text,
-          birthdateController.text, myBioController.text);
-      // Sign up is completed, so adding the current userMail to completed_sign_in collection
-      await completedSignInQueries.addCompletedUser(email);
-      Navigator.pop(context);
-
+    String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+    if (cvld.validateFormFilled(context, usernameController.text,
+        birthdateController.text, myBioController.text)) {
       //sign user up method with google
-    } else {
-      // check if passwords are matching
-      if (widget.userPassword != widget.userConfirmPassword) {
-        showErrorMessage("passwords don't match");
-      } else {
+      if (widget.withGoogle) {
+        // adding a new user to Users Collection
+        await usersQueries.addNewUser(currentEmail, usernameController.text,
+            birthdateController.text, myBioController.text);
+        // Sign up is completed, so adding the current userMail to completed_sign_in collection
+        await queries.addCompletedUser(currentEmail);
+        // going to home page after the users signs up
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+      }
+
+      //sign user up method without google
+      else {
         // show sign up circle
         showDialog(
             context: context,
@@ -71,29 +73,22 @@ class _ContinueRegisterState extends State<ContinueRegister> {
               birthdateController.text,
               myBioController.text);
           // Sign up is completed, so adding the current userMail to completed_sign_in collection
-          await completedSignInQueries.addCompletedUser(widget.userMail);
+          await queries.addCompletedUser(widget.userMail);
 
-          //go to home-page
-          Navigator.pop(context);
+          // going to home page after the users signs up
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomePage()));
         } on FirebaseAuthException catch (e) {
           //pop the loading circle
           Navigator.pop(context);
 
-          showErrorMessage(e.code);
+          showDialog(
+              context: context,
+              builder: (context) =>
+                  MyAlertDialog(message: "An error occurred"));
         }
       }
     }
-  }
-
-  void showErrorMessage(String message) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              backgroundColor: Color.fromARGB(255, 110, 138, 100),
-              title: Center(
-                  child: Text(message, style: TextStyle(color: Colors.white))));
-        });
   }
 
   @override

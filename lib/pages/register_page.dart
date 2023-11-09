@@ -1,14 +1,14 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:myfirstapp/components/my_alert_dialog.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
-import 'package:myfirstapp/pages/continue_register.dart' as CR;
 import 'package:myfirstapp/pages/continue_register.dart';
 import 'package:myfirstapp/services/auth_service.dart';
+import 'package:myfirstapp/validations/register_page_validations.dart' as vld;
+import 'package:myfirstapp/queries/completed_sign_in_queries.dart' as queries;
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -24,25 +24,56 @@ class _RegisterState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-   continueRegister(bool withGoogle) async{
-    if (withGoogle)
-    {
-        await AuthService().signInWithGoogle();
+  continueRegister(bool withGoogle) async {
+    String currentEmail;
+    // saving the current email - depends whether googleButton is pressed or not
+    if (withGoogle) {
+      currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+    } else {
+      currentEmail = mailController.text;
     }
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ContinueRegister(
-                  userMail: mailController.text,
-                  userPassword: passwordController.text,
-                  userConfirmPassword: confirmPasswordController.text,
-                  withGoogle: withGoogle
-                )));
+
+    if (vld.validateFormFilled(context, withGoogle, mailController.text,
+        passwordController.text, confirmPasswordController.text)) {
+      if (withGoogle) {
+        await AuthService().signInWithGoogle();
+      }
+      // checking if the user has already signed up
+      final bool completed = await queries.emailCompletedSignIn(currentEmail);
+      // user has signed up
+      if (completed) {
+        // ignore: use_build_context_synchronously
+        showDialog(
+            context: context,
+            // ignore: prefer_const_constructors
+            builder: (context) => MyAlertDialog(
+                message:
+                    "You already have an account connected to this email"));
+      } else {
+        // user has not signed up yet
+        // check if passwords are matching
+        if (passwordController.text != confirmPasswordController.text) {
+          showDialog(
+              context: context,
+              builder: (context) =>
+                  MyAlertDialog(message: "passwords don't match"));
+        } else {
+          // ignore: use_build_context_synchronously
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ContinueRegister(
+                      userMail: mailController.text,
+                      userPassword: passwordController.text,
+                      userConfirmPassword: confirmPasswordController.text,
+                      withGoogle: withGoogle)));
+        }
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    print("arrived");
     return Scaffold(
         backgroundColor: Color.fromARGB(225, 220, 232, 220),
         body: SafeArea(
@@ -70,7 +101,7 @@ class _RegisterState extends State<RegisterPage> {
                   MyTextField(
                     controller: mailController,
                     hintText: 'Email',
-                    obscureText: false, 
+                    obscureText: false,
                     maximumLines: 1,
                     prefixIcon: Icons.mail,
                   ),
@@ -81,8 +112,8 @@ class _RegisterState extends State<RegisterPage> {
                     controller: passwordController,
                     hintText: 'password',
                     obscureText: true,
-                     maximumLines: 1,
-                     prefixIcon: Icons.lock,
+                    maximumLines: 1,
+                    prefixIcon: Icons.lock,
                   ),
                   SizedBox(height: 10),
 
@@ -100,9 +131,10 @@ class _RegisterState extends State<RegisterPage> {
 
                   SizedBox(height: 25),
 
-                  //sign up button
+                  //continue button
 
-                  MyButton(onTap: () => continueRegister(false), text: 'Continue'),
+                  MyButton(
+                      onTap: () => continueRegister(false), text: 'Continue'),
 
                   SizedBox(height: 50),
 

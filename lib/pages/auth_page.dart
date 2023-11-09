@@ -12,24 +12,47 @@ class AuthPage extends StatelessWidget{
   const AuthPage({super.key});
   
 
-  @override
-  Widget build(BuildContext context) {
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     body: StreamBuilder<User?>(
+  //       stream: FirebaseAuth.instance.authStateChanges(), 
+  //       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+  //         // user logged in
+  //         if(snapshot.hasData){
+  
+  //           return HomePage();
+  //         }
+  //         // user not logged in
+  //         else{
+  //           return const LoginOrRegisterPage();
+  //         }
+  //       }
+        
+  //       ),
+  //   );
+  // }
 
-    return Scaffold(
-      body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(), 
-        builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-          // user logged in
-          if(snapshot.hasData){
+
+  @override
+  Widget build(context) {
+    return FutureBuilder<bool>(
+      future: emailCompletedSignIn(""),
+      builder: (context, AsyncSnapshot<bool> snapshot) {
+        if (snapshot.hasData) {
+          bool completedSigningIn = snapshot.data ?? false;
+          if (completedSigningIn)
+          {
             return HomePage();
           }
-          // user not logged in
-          else{
-            return const LoginOrRegisterPage();
+          else
+          {
+            return LoginOrRegisterPage();
           }
+        } else {
+          return CircularProgressIndicator();
         }
-        
-        ),
+      }
     );
   }
 }

@@ -7,29 +7,39 @@ void updateUsersCollection(
     bool email, bool username, bool birthdate, bool bio) {}
 
 // setters
-Future updateEmail(String email) async {
+Future <void> updateEmail(String email) async {
   await FirebaseFirestore.instance.collection('users').add({'email': email});
 }
 
-Future updateUsername(String username) async {
+Future <void> updateUsername(String username) async {
   await FirebaseFirestore.instance
       .collection('users')
       .add({'username': username});
 }
 
-Future updateBirthdate(Timestamp birthdate) async {
+Future <void> updateBirthdate(Timestamp birthdate) async {
   await FirebaseFirestore.instance
       .collection('users')
       .add({'birth_date': birthdate});
 }
 
-Future updateBio(String bio) async {
+Future <void> updateBio(String bio) async {
   await FirebaseFirestore.instance.collection('users').add({'bio': bio});
 }
 
-Future addNewUser(
+// Future addNewUser(
+//     String email, String username, String birthdate, String bio) async {
+//   await FirebaseFirestore.instance.collection('users').add({
+//     'email': email,
+//     'username': username,
+//     'birth_date': birthdate,
+//     'bio': bio
+//   });
+// }
+
+Future <void> addNewUser(
     String email, String username, String birthdate, String bio) async {
-  await FirebaseFirestore.instance.collection('users').add({
+  await FirebaseFirestore.instance.collection('users').doc(email).set({
     'email': email,
     'username': username,
     'birth_date': birthdate,
