@@ -4,6 +4,7 @@ import "package:flutter/material.dart";
 import "package:myfirstapp/components/my_button.dart";
 import "package:myfirstapp/components/my_date_picker.dart";
 import "package:myfirstapp/components/my_textfield.dart";
+import "package:myfirstapp/pages/choose_tags_page.dart";
 
 class ContinueRegister extends StatefulWidget {
   final String userMail;
@@ -24,9 +25,16 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   final userNameController = TextEditingController();
   final myBioController = TextEditingController();
 
+  //navigate to tags page
+  void chooseTags() async{
+   Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const MyTags()));
+  }
+
   //sign user up method
   void signUserUp() async{
-
     // check if passwords are matching
     if(widget.userPassword != widget.userConfirmPassword){
       showErrorMessage("passwords don't match");
@@ -127,9 +135,13 @@ class _ContinueRegisterState extends State<ContinueRegister> {
             obscureText: false,
             prefixIcon: Icons.face,),
           const SizedBox(height: 10),
+          MyButton(onTap: chooseTags,
+           text: "Choose Your Tags"),
+           const SizedBox(height: 10),
           MyButton(onTap: signUserUp,
            text: "Sign Up"),
-           const SizedBox(height: 10),
+           
+           
            
         ],
         )

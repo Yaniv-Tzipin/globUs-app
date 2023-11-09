@@ -5,6 +5,8 @@ import 'package:myfirstapp/pages/auth_page.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:myfirstapp/providers/provider.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async{
@@ -21,9 +23,12 @@ class MyApp extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return  const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home:  MyTags() //AuthPage()
+    return  ChangeNotifierProvider(
+      create: (context) => MyProvider(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: AuthPage()
+      ),
     );
   }
 }
