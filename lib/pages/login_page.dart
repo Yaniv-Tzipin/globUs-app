@@ -222,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                   // google button
-                  SquareTitle(onTap: () => AuthService().signInWithGoogle(),
+                  SquareTitle(onTap: () => {AuthService().signInWithGoogle()},
                   imagePath: 'lib/images/google.png'),
                   SizedBox(width:25),
           

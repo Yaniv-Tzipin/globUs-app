@@ -1,10 +1,14 @@
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:get/route_manager.dart";
+import "package:myfirstapp/components/choose_tags_button.dart";
 import "package:myfirstapp/components/my_button.dart";
 import "package:myfirstapp/components/my_date_picker.dart";
 import "package:myfirstapp/components/my_textfield.dart";
 import "package:myfirstapp/pages/choose_tags_page.dart";
+import 'package:myfirstapp/providers/my_provider.dart';
+import "package:provider/provider.dart";
 
 class ContinueRegister extends StatefulWidget {
   final String userMail;
@@ -24,13 +28,11 @@ class _ContinueRegisterState extends State<ContinueRegister> {
 
   final userNameController = TextEditingController();
   final myBioController = TextEditingController();
+  
 
   //navigate to tags page
   void chooseTags() async{
-   Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const MyTags()));
+   Get.to(MyTags());
   }
 
   //sign user up method
@@ -105,7 +107,6 @@ class _ContinueRegisterState extends State<ContinueRegister> {
  
   @override
   Widget build(BuildContext context) {
-    
     return  Scaffold(
       appBar: AppBar(
       ),
@@ -135,8 +136,10 @@ class _ContinueRegisterState extends State<ContinueRegister> {
             obscureText: false,
             prefixIcon: Icons.face,),
           const SizedBox(height: 10),
-          MyButton(onTap: chooseTags,
-           text: "Choose Your Tags"),
+          //MyButton(onTap: chooseTags,
+           //text: "Choose Your Tags"),
+           GestureDetector(child: const MyTagsButton(),
+           onTap: chooseTags,),
            const SizedBox(height: 10),
           MyButton(onTap: signUserUp,
            text: "Sign Up"),

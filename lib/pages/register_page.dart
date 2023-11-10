@@ -36,6 +36,7 @@ class _RegisterState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
         backgroundColor: Color.fromARGB(225, 220, 232, 220),
         body: SafeArea(

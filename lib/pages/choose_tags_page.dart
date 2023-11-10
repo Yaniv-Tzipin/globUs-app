@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
+import "package:get/route_manager.dart";
 import "package:myfirstapp/components/my_tags_grid.dart";
-import 'package:myfirstapp/providers/provider.dart';
+import 'package:myfirstapp/providers/my_provider.dart';
 import "package:provider/provider.dart";
 import 'package:myfirstapp/components/my_colors.dart' as my_colors;
 
@@ -11,7 +12,8 @@ class MyTags extends StatefulWidget {
   State<MyTags> createState() => _MyTagsState();
 }
 
-class _MyTagsState extends State<MyTags> {
+class _MyTagsState extends State<MyTags>{
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +86,7 @@ class _MyTagsState extends State<MyTags> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
           elevation: 0,
            toolbarHeight: 40,
             title: Text('My Tags $tagsCount/10'),
@@ -206,7 +208,7 @@ class CustomSearch extends SearchDelegate{
           title: result,
         );
       }), 
-      gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 4,
       childAspectRatio: 1,
       )
@@ -226,32 +228,38 @@ class MyTag extends StatefulWidget {
   final MyProvider tagsCounter;
   
   @override
-  State<MyTag> createState() => _myTagState();
+  State<MyTag> createState() => _MyTagState();
 }
 
-class _myTagState extends State<MyTag> {
+class _MyTagState extends State<MyTag> {
   bool isSelected = false;
-
   bool ableToAddTag(){
       return widget.tagsCounter.count != 10;
     }
 
   @override
   Widget build(BuildContext context) {
+
+    isSelected = widget.tagsCounter.isPressed(widget); 
+    
     return InputChip(label: Text(widget.text),
     onSelected: (bool newBool){
   
-      if(!isSelected){
+      if(!widget.tagsCounter.isPressed(widget)){
       if(ableToAddTag()){
       isSelected = !isSelected;
       widget.tagsCounter.increment();
-      widget.tagsCounter.addTagToChosen(widget);
+      widget.tagsCounter.addTagToPressed(widget);
+      widget.tagsCounter.addTagToChosen(Chip(label: Text(widget.text),));
       }
       }
       else{
       isSelected = !isSelected;
       widget.tagsCounter.decrement();
       widget.tagsCounter.removeTagFromChosen(
+        Chip(label: Text(widget.text),)
+      );
+      widget.tagsCounter.removeTagFromPressed(
         widget
       );
       }
@@ -274,11 +282,10 @@ class searchedTag extends StatefulWidget {
 }
 
 class _searchedTagState extends State<searchedTag> {
-  bool isSelected = false;
+  static bool isSelected = false;
   
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return InputChip(label: Text(widget.text),
     onSelected: (bool newBool){
       setState(() {

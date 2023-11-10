@@ -44,7 +44,7 @@ class _MyDatePickerState extends State<MyDatePicker> {
               prefixIcon: const Icon(Icons.calendar_today),
               prefixIconColor: Color.fromARGB(255, 176, 175, 171),
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none),
               focusedBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: Colors.white),
