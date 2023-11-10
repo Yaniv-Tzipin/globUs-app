@@ -11,13 +11,13 @@ import 'package:myfirstapp/providers/my_provider.dart';
 import "package:provider/provider.dart";
 
 class ContinueRegister extends StatefulWidget {
-  final String userMail;
-  final String userPassword;
-  final String userConfirmPassword;
+  //final String userMail;
+  // final String userPassword;
+  // final String userConfirmPassword;
   const ContinueRegister({super.key, 
-  required this.userMail,
-  required this.userPassword,
-  required this.userConfirmPassword,
+  // required this.userMail,
+  // required this.userPassword,
+  // required this.userConfirmPassword,
    });
 
   @override
@@ -36,79 +36,83 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   }
 
   //sign user up method
-  void signUserUp() async{
-    // check if passwords are matching
-    if(widget.userPassword != widget.userConfirmPassword){
-      showErrorMessage("passwords don't match");
-    }
-    else{
-    // show sign up circle 
-    showDialog(
-      context: context,
-       builder: (context){
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-       }
-      );
+  void signUserUp() async{ // !!!!NEED TO CONSULT WITH NADAV/NOA
+  //   // check if passwords are matching
+  //   if(widget.userPassword != widget.userConfirmPassword){
+  //     showErrorMessage("passwords don't match");
+  //   }
+  //   else{
+  //   // show sign up circle 
+  //   showDialog(
+  //     context: context,
+  //      builder: (context){
+  //       return const Center(
+  //         child: CircularProgressIndicator(),
+  //       );
+  //      }
+  //     );
 
-    // try creating the user
-    try{
+  //   // try creating the user
+  //   try{
     
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: widget.userMail,
-      password: widget.userPassword
-      );
-    //pop the loading circle
-    Navigator.pop(context);
+  //     await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //     email: widget.userMail,
+  //     password: widget.userPassword
+  //     );
+  //   //pop the loading circle
+  //   Navigator.pop(context);
 
-    addUserDetails(widget.userMail.trim());
+  //   addUserDetails(widget.userMail.trim());
 
-     //go to home-page
-    Navigator.pop(context);
+  //    //go to home-page
+  //   Navigator.pop(context);
 
-    } on FirebaseAuthException catch (e){
+  //   } on FirebaseAuthException catch (e){
 
-    //pop the loading circle
-    Navigator.pop(context);
+  //   //pop the loading circle
+  //   Navigator.pop(context);
       
-    showErrorMessage(e.code);
+  //   showErrorMessage(e.code);
     
-    }
-  }
-  }
+  //   }
+  // }
+  // }
 
-  Future addUserDetails(String email) async{
-    await FirebaseFirestore.instance.collection('users').add({
-      'email': email,
-      'username': userNameController.text.trim(),
-      // to add fields
-    }
-    );
-  }
+  // Future addUserDetails(String email) async{
+  //   await FirebaseFirestore.instance.collection('users').add({
+  //     'email': email,
+  //     'username': userNameController.text.trim(),
+  //     // to add fields
+  //   }
+  //   );
+  // }
 
 
-  void showErrorMessage(String message){
-    showDialog(context: context,
-     builder: (context)
-     {
-      return AlertDialog(
-        backgroundColor: Color.fromARGB(255, 110, 138, 100),
-        title: Center(
-          child: Text(message,
-          style: TextStyle(color: Colors.white)
-          )
-        )
-      );
+  // void showErrorMessage(String message){
+  //   showDialog(context: context,
+  //    builder: (context)
+  //    {
+  //     return AlertDialog(
+  //       backgroundColor: Color.fromARGB(255, 110, 138, 100),
+  //       title: Center(
+  //         child: Text(message,
+  //         style: TextStyle(color: Colors.white)
+  //         )
+  //       )
+  //     );
 
-     }
-     );
+  //    }
+  //    );
+  // }
   }
  
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        
       ),
       backgroundColor: Color.fromARGB(225, 220, 232, 220),
       body: 
@@ -142,7 +146,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
            onTap: chooseTags,),
            const SizedBox(height: 10),
           MyButton(onTap: signUserUp,
-           text: "Sign Up"),
+           text: "Ready to Go"),
            
            
            

@@ -6,7 +6,7 @@ import 'package:myfirstapp/pages/auth_page.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:myfirstapp/providers/auth_status_provider.dart';
+import 'package:myfirstapp/providers/user_data_provider.dart';
 import 'package:myfirstapp/providers/my_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -16,6 +16,7 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
   );
+ 
   runApp(const MyApp());
 }
 
@@ -25,10 +26,12 @@ class MyApp extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    
+
     return  MultiProvider(
       providers: [
       ChangeNotifierProvider<MyProvider>(create: (context) => MyProvider(),),
-      ChangeNotifierProvider<AuthStateChanges>(create: (context)=>AuthStateChanges())
+      ChangeNotifierProvider<UserDataProvider>(create: (context)=>UserDataProvider())
       ],
       child: const GetMaterialApp(
         debugShowCheckedModeBanner: false,

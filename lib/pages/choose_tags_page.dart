@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import "package:myfirstapp/components/my_tags_grid.dart";
 import 'package:myfirstapp/providers/my_provider.dart';
-
 import "package:provider/provider.dart";
 import 'package:myfirstapp/components/my_colors.dart' as my_colors;
 
@@ -93,7 +92,6 @@ class _MyTagsState extends State<MyTags>{
       MyTag(tagsCounter: tagsCounter, text: 'colture'),
       MyTag(tagsCounter: tagsCounter, text: 'museum'),
       MyTag(tagsCounter: tagsCounter, text: 'skydiving'),
-      MyTag(tagsCounter: tagsCounter, text: 'hiking'),
       MyTag(tagsCounter: tagsCounter, text: 'culinary'),
       MyTag(tagsCounter: tagsCounter, text: 'bars'),
       MyTag(tagsCounter: tagsCounter, text: 'parties'),
@@ -105,7 +103,7 @@ class _MyTagsState extends State<MyTags>{
       MyTag(tagsCounter: tagsCounter, text: 'landscapes'),
       MyTag(tagsCounter: tagsCounter, text: 'LGBTQ+'),
       MyTag(tagsCounter: tagsCounter, text: 'horse riding'),
-      MyTag(tagsCounter: tagsCounter, text: 'couch surfing'),
+      MyTag(tagsCounter: tagsCounter, text: 'couch surffing'),
       MyTag(tagsCounter: tagsCounter, text: 'caravan'),
       MyTag(tagsCounter: tagsCounter, text: 'mind cleaning'),
       MyTag(tagsCounter: tagsCounter, text: 'spa'),

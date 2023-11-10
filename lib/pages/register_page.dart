@@ -1,13 +1,14 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
 import 'package:myfirstapp/pages/continue_register.dart';
 import 'package:myfirstapp/services/auth_service.dart';
+import 'package:myfirstapp/services/user_validation.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -17,21 +18,88 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterState();
 }
 
+
+
 class _RegisterState extends State<RegisterPage> {
   // text editing controllers
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  void continueRegister() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ContinueRegister(
-                  userMail: mailController.text,
-                  userPassword: passwordController.text,
-                  userConfirmPassword: confirmPasswordController.text,
-                )));
+  void continueRegister() async{
+
+    //validate password
+    bool passwordIsValid = ValidateUser().validatePasswords(
+      passwordController.text, confirmPasswordController.text);
+    if(!passwordIsValid){
+      showErrorMessage("passwords don't match");
+    }
+    else{
+    // show sign up circle 
+    showDialog(
+      context: context,
+       builder: (context){
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+       }
+      );
+    
+    // try creating the user
+    try{
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: mailController.text.trim(),
+      password: passwordController.text
+      );
+
+    //pop the loading circle
+    Navigator.pop(context); 
+
+    // navigate to continue register
+    Get.to(ContinueRegister());
+
+
+    //!!!!! DONT FORGET TO ADD USERS' DETAILS!!!!!! use this method:
+  //   Future addUserDetails(String email) async{
+  //   await FirebaseFirestore.instance.collection('users').add({
+  //     'email': email,
+  //     'username': userNameController.text.trim(),
+  //     // to add fields
+  //   }
+  //   );
+  // }
+
+    }on FirebaseAuthException catch (e){
+
+    //pop the loading circle
+    Navigator.pop(context);
+
+
+    //show a FirebaseAuth error
+    showErrorMessage(e.code);
+    }
+    }
+  }
+
+    void showErrorMessage(String message){
+    showDialog(context: context,
+     builder: (context)
+     {
+      return AlertDialog(
+        backgroundColor: Color.fromARGB(255, 110, 138, 100),
+        title: Center(
+          child: Text(message,
+          style: TextStyle(color: Colors.white)
+          )
+        )
+      );
+
+     }
+     );
+  }
+
+  void signUpWithGoogle() async{
+  await AuthService().signInWithGoogle();
   }
 
   @override
@@ -96,7 +164,7 @@ class _RegisterState extends State<RegisterPage> {
 
                   //sign up button
 
-                  MyButton(onTap: continueRegister, text: 'Continue'),
+                  MyButton(onTap: continueRegister, text: 'Sign Up'),
 
                   SizedBox(height: 50),
 
@@ -137,7 +205,7 @@ class _RegisterState extends State<RegisterPage> {
                     children: [
                       // google button
                       SquareTitle(
-                          onTap: () => AuthService().signInWithGoogle(),
+                          onTap: () => signUpWithGoogle(),
                           imagePath: 'lib/images/google.png'),
                       SizedBox(width: 25),
 

@@ -21,6 +21,7 @@ class LoginOrRegisterPage extends StatefulWidget{
       });
     }
 
+  @override
   Widget build(BuildContext context) {
 
     if(showLoginPage){

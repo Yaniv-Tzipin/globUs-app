@@ -7,6 +7,7 @@ class MyProvider extends ChangeNotifier{
   List<Chip> _chosenTags = [];
   int get count => _count;
   List<Widget> get chosenTags => _chosenTags;
+
   List<MyTag> pressedTags = [];
 
   void increment(){
