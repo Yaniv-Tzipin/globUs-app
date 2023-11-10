@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
-import "package:get/route_manager.dart";
 import "package:myfirstapp/components/my_tags_grid.dart";
 import 'package:myfirstapp/providers/my_provider.dart';
+
 import "package:provider/provider.dart";
 import 'package:myfirstapp/components/my_colors.dart' as my_colors;
 
@@ -83,7 +83,37 @@ class _MyTagsState extends State<MyTags>{
       MyTag(tagsCounter: tagsCounter, text: 'sociable'),
       MyTag(tagsCounter: tagsCounter, text: 'tolerant'),
     ];
-
+    List<MyTag> wishListTags = [
+      MyTag(tagsCounter: tagsCounter, text: 'camping'),
+      MyTag(tagsCounter: tagsCounter, text: 'backpacking'),
+      MyTag(tagsCounter: tagsCounter, text: 'climbing'),
+      MyTag(tagsCounter: tagsCounter, text: 'sports'),
+      MyTag(tagsCounter: tagsCounter, text: 'skiing'),
+      MyTag(tagsCounter: tagsCounter, text: 'shopping'),
+      MyTag(tagsCounter: tagsCounter, text: 'colture'),
+      MyTag(tagsCounter: tagsCounter, text: 'museum'),
+      MyTag(tagsCounter: tagsCounter, text: 'skydiving'),
+      MyTag(tagsCounter: tagsCounter, text: 'hiking'),
+      MyTag(tagsCounter: tagsCounter, text: 'culinary'),
+      MyTag(tagsCounter: tagsCounter, text: 'bars'),
+      MyTag(tagsCounter: tagsCounter, text: 'parties'),
+      MyTag(tagsCounter: tagsCounter, text: 'music festivals'),
+      MyTag(tagsCounter: tagsCounter, text: 'religion'),
+      MyTag(tagsCounter: tagsCounter, text: 'amusement parks'),
+      MyTag(tagsCounter: tagsCounter, text: 'beach'),
+      MyTag(tagsCounter: tagsCounter, text: 'nature'),
+      MyTag(tagsCounter: tagsCounter, text: 'landscapes'),
+      MyTag(tagsCounter: tagsCounter, text: 'LGBTQ+'),
+      MyTag(tagsCounter: tagsCounter, text: 'horse riding'),
+      MyTag(tagsCounter: tagsCounter, text: 'couch surfing'),
+      MyTag(tagsCounter: tagsCounter, text: 'caravan'),
+      MyTag(tagsCounter: tagsCounter, text: 'mind cleaning'),
+      MyTag(tagsCounter: tagsCounter, text: 'spa'),
+      MyTag(tagsCounter: tagsCounter, text: 'rafting'),
+      MyTag(tagsCounter: tagsCounter, text: 'business trip'),
+      MyTag(tagsCounter: tagsCounter, text: 'peace'),
+      MyTag(tagsCounter: tagsCounter, text: 'fun'),
+    ];
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -113,16 +143,6 @@ class _MyTagsState extends State<MyTags>{
             MyTagsGrid(tagsTheme: 'My Tags',
              icon: Icon(Icons.check_rounded),
             listOfTags: chosenTagsList),
-            SearchBar(
-                backgroundColor: MaterialStateProperty.all(my_colors.searchBarColor),
-                elevation: MaterialStateProperty.all(0),
-                hintText: 'Type here..',
-                leading: IconButton(
-                  icon: Icon(Icons.search),
-                  onPressed: () {
-                    showSearch(context: context, delegate: CustomSearch());
-                  },
-                )),
             const SizedBox(
               height: 20,
             ),
@@ -142,7 +162,7 @@ class _MyTagsState extends State<MyTags>{
       
             MyTagsGrid(tagsTheme: 'Travel Wishlist',
              icon: Icon(Icons.travel_explore),
-            listOfTags: [MyTag(tagsCounter: tagsCounter, text: 'yesh')],)
+            listOfTags: wishListTags,)
       
           ],
         ),
@@ -151,71 +171,7 @@ class _MyTagsState extends State<MyTags>{
   }
 }
 
-class CustomSearch extends SearchDelegate{
-
-  List<searchedTag> allData = [searchedTag(text: 'hi'),
-  searchedTag(text: 'bi'),searchedTag(text: 'mi'),searchedTag(text: 'gi'),searchedTag(text: 'ci'),];
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(onPressed: (){
-        query = '';
-      }, 
-      icon: Icon(Icons.clear))
-    ];
-  }
-
-  @override
-  Widget? buildLeading(BuildContext context) {
-    return IconButton(onPressed: (){
-      close(context, null);
-    }, icon: const Icon(Icons.arrow_back));
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    List<searchedTag> matchquery =[];
-    for(searchedTag tag in allData){
-      if(tag.text.toLowerCase().contains(query.toLowerCase())){
-        matchquery.add(tag);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchquery.length,
-      itemBuilder: ((context, index) {
-        searchedTag result = matchquery[index];
-        return ListTile(
-          textColor: Colors.amber,
-          title: Text(result.text),
-        );
-      })
-    );
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    List<searchedTag> matchquery =[];
-    for(searchedTag tag in allData){
-      if(tag.text.toLowerCase().contains(query.toLowerCase())){
-        matchquery.add(tag);
-      }
-    }
-    return GridView.builder(
-      itemCount: matchquery.length,
-      itemBuilder: ((context, index) {
-        searchedTag result = matchquery[index];
-        return ListTile(
-          title: result,
-        );
-      }), 
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 4,
-      childAspectRatio: 1,
-      )
-    );
-  
-  }
-}
+//the tags in the main tags choose page and in the tags grid 
 
 class MyTag extends StatefulWidget {
   final String text;
@@ -271,32 +227,5 @@ class _MyTagState extends State<MyTag> {
   }
 
 }
-
-class searchedTag extends StatefulWidget {
-  final String text;
-   const searchedTag({super.key, required this.text,
-  });
-  
-  @override
-  State<searchedTag> createState() => _searchedTagState();
-}
-
-class _searchedTagState extends State<searchedTag> {
-  static bool isSelected = false;
-  
-  @override
-  Widget build(BuildContext context) {
-    return InputChip(label: Text(widget.text),
-    onSelected: (bool newBool){
-      setState(() {
-        isSelected = !isSelected;
-      }); 
-    },
-    selected: isSelected,
-    selectedColor: my_colors.selectedTagColor
-    );
-  }
-}
-
 
 
