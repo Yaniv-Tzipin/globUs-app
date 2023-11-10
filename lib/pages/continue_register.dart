@@ -9,6 +9,7 @@ import "package:myfirstapp/queries/completed_sign_in_queries.dart" as queries;
 import "package:myfirstapp/queries/users_queries.dart" as usersQueries;
 import 'package:myfirstapp/validations/continue_register_page_validations.dart'
     as cvld;
+import "package:shared_preferences/shared_preferences.dart";
 
 class ContinueRegister extends StatefulWidget {
   final String userMail;
@@ -34,8 +35,11 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   //sign user up
   void signUserUp() async {
     String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+    SharedPreferences pref = await SharedPreferences.getInstance();
     if (cvld.validateFormFilled(context, usernameController.text,
         birthdateController.text, myBioController.text)) {
+        // updating preferences
+        pref.setBool("loggedIn", true);
       //sign user up method with google
       if (widget.withGoogle) {
         // adding a new user to Users Collection
@@ -43,6 +47,9 @@ class _ContinueRegisterState extends State<ContinueRegister> {
             birthdateController.text, myBioController.text);
         // Sign up is completed, so adding the current userMail to completed_sign_in collection
         await queries.addCompletedUser(currentEmail);
+        // updating preferences
+        pref.setString("email", currentEmail);
+
         // going to home page after the users signs up
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomePage()));
@@ -74,6 +81,8 @@ class _ContinueRegisterState extends State<ContinueRegister> {
               myBioController.text);
           // Sign up is completed, so adding the current userMail to completed_sign_in collection
           await queries.addCompletedUser(widget.userMail);
+          // updating preferences
+          pref.setString("email", widget.userMail);
 
           // going to home page after the users signs up
           Navigator.push(

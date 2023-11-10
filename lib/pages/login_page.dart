@@ -10,6 +10,7 @@ import 'package:myfirstapp/pages/forgot_pw_page.dart';
 import 'package:myfirstapp/pages/home_page.dart';
 import 'package:myfirstapp/queries/completed_sign_in_queries.dart' as queries;
 import 'package:myfirstapp/services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -26,8 +27,8 @@ class _LoginPageState extends State<LoginPage> {
   final userMail = FirebaseAuth.instance.currentUser?.email ?? "";
 
   void continueSigningWithGoogle() async {
-    String email = FirebaseAuth.instance.currentUser?.email ?? "";
     await AuthService().signInWithGoogle();
+    String email = FirebaseAuth.instance.currentUser?.email ?? "";
     // checking if the current email has already signed up
     final completed = queries.emailCompletedSignIn(email);
     // User has not signed up yet
@@ -41,6 +42,12 @@ class _LoginPageState extends State<LoginPage> {
     }
     // user has signed up
     else {
+      // If the user that trying to sign in with google already completed sigining 
+      // in in the past - update his preferences and then go to home page
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setBool("loggedIn", true);
+      pref.setString("email", email);
+
       // ignore: use_build_context_synchronously
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => HomePage()));
@@ -48,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void signUserIn() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
     // show log in circle
     showDialog(
         context: context,
@@ -56,12 +64,16 @@ class _LoginPageState extends State<LoginPage> {
             child: CircularProgressIndicator(),
           );
         });
-    // try signing in
+    // try signing in without google
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: mailController.text, password: passwordController.text);
       //pop the loading circle
       Navigator.pop(context);
+
+      // updating the preferences of a user signing in without google
+      pref.setBool("loggedIn", true);
+      pref.setString("email", mailController.text);
 
       // ignore: use_build_context_synchronously
       Navigator.push(
@@ -75,13 +87,13 @@ class _LoginPageState extends State<LoginPage> {
         //show error to user
         showDialog(
             context: context,
-            builder: (context) =>
-                MyAlertDialog(message:  'Incorrect Email or password Please try again!'));
+            builder: (context) => MyAlertDialog(
+                message: 'Incorrect Email or password Please try again!'));
 
         //ANOTHER ERROR
       } else {
         //show error to user
-               showDialog(
+        showDialog(
             context: context,
             builder: (context) =>
                 MyAlertDialog(message: 'an error occured, please try again'));
