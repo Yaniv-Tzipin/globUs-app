@@ -1,14 +1,13 @@
-import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
+
 import "package:flutter/material.dart";
-import "package:get/route_manager.dart";
+import "package:get/route_manager.dart"; 
 import "package:myfirstapp/components/choose_tags_button.dart";
 import "package:myfirstapp/components/my_button.dart";
 import "package:myfirstapp/components/my_date_picker.dart";
 import "package:myfirstapp/components/my_textfield.dart";
 import "package:myfirstapp/pages/choose_tags_page.dart";
-import 'package:myfirstapp/providers/my_provider.dart';
-import "package:provider/provider.dart";
+import "package:myfirstapp/pages/login_or_register_page.dart";
+
 
 class ContinueRegister extends StatefulWidget {
   //final String userMail;
@@ -32,7 +31,11 @@ class _ContinueRegisterState extends State<ContinueRegister> {
 
   //navigate to tags page
   void chooseTags() async{
-   Get.to(MyTags());
+   Get.to(const MyTags());
+  }
+
+  void goToLogInPage() async{
+    Get.to(const LoginOrRegisterPage());
   }
 
   //sign user up method
@@ -111,10 +114,12 @@ class _ContinueRegisterState extends State<ContinueRegister> {
     return  Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        leading: IconButton(icon: const Icon(Icons.arrow_back),
+        onPressed: goToLogInPage,),
         elevation: 0,
         
       ),
-      backgroundColor: Color.fromARGB(225, 220, 232, 220),
+      backgroundColor: const Color.fromARGB(225, 220, 232, 220),
       body: 
       SafeArea(child: 
       Center(child: 
@@ -131,7 +136,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
 
             ),
           const SizedBox(height: 10),
-           MyDatePicker(),   
+           const MyDatePicker(),   
           const SizedBox(height: 10),
           MyTextField(
           controller: myBioController,
@@ -142,8 +147,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
           const SizedBox(height: 10),
           //MyButton(onTap: chooseTags,
            //text: "Choose Your Tags"),
-           GestureDetector(child: const MyTagsButton(),
-           onTap: chooseTags,),
+           GestureDetector(onTap: chooseTags,child: const MyTagsButton(),),
            const SizedBox(height: 10),
           MyButton(onTap: signUserUp,
            text: "Ready to Go"),

@@ -1,4 +1,3 @@
-import "dart:ffi";
 
 import "package:flutter/material.dart";
 import "package:myfirstapp/components/my_colors.dart" as my_colors;
@@ -8,7 +7,6 @@ class MyTagsGrid extends StatefulWidget {
   final Icon icon;
   
   final List<Widget> listOfTags;
-  //final List<InputChip> listOfTags;
    const MyTagsGrid({super.key,
    required this.tagsTheme,
   required this.icon,
@@ -66,26 +64,3 @@ class _MyTagsGridState extends State<MyTagsGrid> {
     );
   }
 }
-
-
-
-    // return  Container(
-    //   child: Column(
-    //     children: [
-    //       Row(
-    //         mainAxisAlignment: MainAxisAlignment.start,
-    //         children: [Icon(widget.icon.icon),
-    //         Text(
-    //         widget.tagsTheme,
-    //         )
-    //       ],),
-          
-    //     ],
-    //   ),
-    //   padding: EdgeInsets.all(20),
-    //   decoration: BoxDecoration(
-    //     border: Border.all(color: Colors.white),
-    //     borderRadius: BorderRadius.circular(16),
-    //     color: Color.fromARGB(225,220,232,220)
-    //   )
-    //   );

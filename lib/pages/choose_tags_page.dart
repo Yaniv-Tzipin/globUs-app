@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:myfirstapp/components/my_tags_grid.dart";
-import 'package:myfirstapp/providers/my_provider.dart';
+import 'package:myfirstapp/providers/my_tags_provider.dart';
 import "package:provider/provider.dart";
 import 'package:myfirstapp/components/my_colors.dart' as my_colors;
 
@@ -16,7 +16,7 @@ class _MyTagsState extends State<MyTags>{
 
   @override
   Widget build(BuildContext context) {
-    final tagsCounter = Provider.of<MyProvider>(context);
+    final tagsCounter = Provider.of<MyTagsProvider>(context);
     final tagsCount = tagsCounter.count;
     final chosenTagsList = tagsCounter.chosenTags;
 
@@ -139,13 +139,13 @@ class _MyTagsState extends State<MyTags>{
             ),
             const SizedBox(height: 20),
             MyTagsGrid(tagsTheme: 'My Tags',
-             icon: Icon(Icons.check_rounded),
+             icon: const Icon(Icons.check_rounded),
             listOfTags: chosenTagsList),
             const SizedBox(
               height: 20,
             ),
             MyTagsGrid(
-              icon: Icon(Icons.festival_rounded),
+              icon: const Icon(Icons.festival_rounded),
               listOfTags: hobbiesTags,
               tagsTheme: 'Hobbies',
             ),
@@ -153,13 +153,13 @@ class _MyTagsState extends State<MyTags>{
               height: 20,
             ),
             MyTagsGrid(
-              icon: Icon(Icons.self_improvement),
+              icon: const Icon(Icons.self_improvement),
               listOfTags: personalityTags,
               tagsTheme: 'Traits',
             ),
       
             MyTagsGrid(tagsTheme: 'Travel Wishlist',
-             icon: Icon(Icons.travel_explore),
+             icon: const Icon(Icons.travel_explore),
             listOfTags: wishListTags,)
       
           ],
@@ -169,7 +169,7 @@ class _MyTagsState extends State<MyTags>{
   }
 }
 
-//the tags in the main tags choose page and in the tags grid 
+//the following class represents the tag object
 
 class MyTag extends StatefulWidget {
   final String text;
@@ -179,7 +179,7 @@ class MyTag extends StatefulWidget {
     required this.text,
   });
 
-  final MyProvider tagsCounter;
+  final MyTagsProvider tagsCounter;
   
   @override
   State<MyTag> createState() => _MyTagState();
@@ -197,6 +197,8 @@ class _MyTagState extends State<MyTag> {
     isSelected = widget.tagsCounter.isPressed(widget); 
     
     return InputChip(label: Text(widget.text),
+
+    //logic regarding pressing on the tag
     onSelected: (bool newBool){
   
       if(!widget.tagsCounter.isPressed(widget)){
@@ -204,12 +206,18 @@ class _MyTagState extends State<MyTag> {
       isSelected = !isSelected;
       widget.tagsCounter.increment();
       widget.tagsCounter.addTagToPressed(widget);
+
+      //converting the tag to a chip that can't be pressed and is added to the 
+      //chosen tags grid
       widget.tagsCounter.addTagToChosen(Chip(label: Text(widget.text),));
       }
       }
       else{
       isSelected = !isSelected;
       widget.tagsCounter.decrement();
+
+      //converting the tag to a chip that can't be pressed and is removed from the 
+      //chosen tags grid
       widget.tagsCounter.removeTagFromChosen(
         Chip(label: Text(widget.text),)
       );
@@ -220,7 +228,7 @@ class _MyTagState extends State<MyTag> {
 
     },
     selected: isSelected,
-    selectedColor: my_colors.selectedTagColor,)
+    selectedColor: my_colors.selectedTagColor)
     ;
   }
 

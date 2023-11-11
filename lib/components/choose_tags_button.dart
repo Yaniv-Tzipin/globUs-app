@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 import "package:myfirstapp/components/my_colors.dart";
-import "package:myfirstapp/providers/my_provider.dart";
+import 'package:myfirstapp/providers/my_tags_provider.dart';
 import "package:provider/provider.dart";
 
 class MyTagsButton extends StatelessWidget {
@@ -8,7 +8,7 @@ class MyTagsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final tagsCounter = Provider.of<MyProvider>(context);
+  final tagsCounter = Provider.of<MyTagsProvider>(context);
 
     return Padding(padding: const EdgeInsets.symmetric(horizontal: 25,vertical: 25),
     child: Row(
@@ -21,8 +21,8 @@ class MyTagsButton extends StatelessWidget {
             color:Color.fromARGB(255, 245, 249, 244),
             borderRadius: BorderRadius.circular(8),  
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical:9.0),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(vertical:9.0),
             child: Row(
               children: [
                 SizedBox(width: 10,),
@@ -39,14 +39,18 @@ class MyTagsButton extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 30,),
+        const SizedBox(width: 30,),
         Container(
           height: 55,
           width: 60,
+           decoration: BoxDecoration(
+            color:const Color.fromARGB(255, 245, 249, 244),
+            borderRadius: BorderRadius.circular(8), 
+           ),
           child: Column(
             children: [
-              SizedBox(height: 18,),
-              Text(tagsCounter.count.toString()+'/10',
+              const SizedBox(height: 18,),
+              Text('${tagsCounter.count}/10',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
@@ -54,11 +58,7 @@ class MyTagsButton extends StatelessWidget {
                 color: selectedTagColor
               ),),
             ],
-          ),
-           decoration: BoxDecoration(
-            color:Color.fromARGB(255, 245, 249, 244),
-            borderRadius: BorderRadius.circular(8), 
-           )
+          )
           ),
       ],
     ),
@@ -66,28 +66,3 @@ class MyTagsButton extends StatelessWidget {
   
 }
 }
-
-
-// Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: 25),
-//                 child: TextField(
-//                   controller: controller,
-//                   obscureText: obscureText,
-//                   minLines: 1,
-//                   maxLines: maximumLines,
-//                   decoration: InputDecoration(
-//                     prefixIcon: Icon(prefixIcon),
-//                     prefixIconColor:  Color.fromARGB(255, 176, 175, 171),
-//                     enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)
-//                     ),
-//                     focusedBorder: OutlineInputBorder(
-//                       borderSide: BorderSide(color: Color.fromARGB(225,220,232,220)),
-//                     ),
-//                     fillColor: Color.fromARGB(255, 245, 249, 244),
-//                     filled: true,
-//                     hintText: hintText,
-//                     hintStyle: TextStyle(color: Color.fromARGB(255, 176, 175, 171)),
-//                   ),
-//                 ),
-//               );
-//   }

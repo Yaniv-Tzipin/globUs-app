@@ -18,11 +18,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  Future PasswordReset() async{
+  Future<void> PasswordReset() async{
     try{
+      //try sending a reset mail to the user
       await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailcontroller.text.trim());
+      
       // ignore: use_build_context_synchronously
       showDialog(context: context, builder: (context){
+        // success alert
         return const AlertDialog(content:
         Text("Password reset link sent! Check your Email",
         textAlign: TextAlign.center,
@@ -33,6 +36,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     } on FirebaseAuthException catch(e) {
       // ignore: use_build_context_synchronously
       showDialog(context: context, builder: (context){
+        // error alert
         return AlertDialog(content:
         Text(e.message.toString(),
         textAlign: TextAlign.center,
@@ -42,15 +46,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       );
 
     }
-
-      }
+  }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Color.fromARGB(223, 240, 247, 232),
+      backgroundColor:const Color.fromARGB(223, 240, 247, 232),
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(225, 220, 232, 220),
+        backgroundColor: const Color.fromARGB(225, 220, 232, 220),
         elevation: 0,
       ),
       body: Column(
@@ -86,12 +89,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               ),
               const SizedBox(height: 10),
               MaterialButton(onPressed: PasswordReset,
-              child: Text('Reset Password'),
-              color: Color.fromARGB(255, 98, 130, 107),
+              color: const Color.fromARGB(255, 98, 130, 107),
+              child: const Text('Reset Password'),
               )
       ]
       ),
-
     );
   }
 }

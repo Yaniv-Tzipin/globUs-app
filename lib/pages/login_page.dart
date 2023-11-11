@@ -3,9 +3,12 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
+import 'package:myfirstapp/pages/auth_page.dart';
 import 'package:myfirstapp/pages/forgot_pw_page.dart';
 import 'package:myfirstapp/services/auth_service.dart';
 
@@ -36,18 +39,21 @@ class _LoginPageState extends State<LoginPage> {
         );
        }
       );
-    // try sign in
+    // try sign in, snapshot gets data
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: mailController.text,
       password: passwordController.text
       );
     //pop the loading circle
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
+    Get.to(AuthPage()); 
     
     } on FirebaseAuthException catch (e){
 
     //pop the loading circle
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
       
       //WRONG EMAIL OR PASSWORD

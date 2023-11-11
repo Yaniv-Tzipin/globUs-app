@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors, prefer_const_literals_to_create_immutables
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
@@ -52,7 +51,8 @@ class _RegisterState extends State<RegisterPage> {
       password: passwordController.text
       );
 
-    //pop the loading circle
+    // pop the loading circle
+    // ignore: use_build_context_synchronously
     Navigator.pop(context); 
 
     // navigate to continue register
@@ -72,8 +72,8 @@ class _RegisterState extends State<RegisterPage> {
     }on FirebaseAuthException catch (e){
 
     //pop the loading circle
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
-
 
     //show a FirebaseAuth error
     showErrorMessage(e.code);
@@ -242,6 +242,7 @@ class _RegisterState extends State<RegisterPage> {
               ),
             ),
           ),
-        ));
+        )
+        );
   }
 }

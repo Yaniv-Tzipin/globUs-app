@@ -8,8 +8,7 @@ class HomePage extends StatelessWidget{
 
    final user = FirebaseAuth.instance.currentUser;
 
-   //sign user out method
-
+   //sign user out method, snapshot loosing data
    void signUserOut(){
     FirebaseAuth.instance.signOut();
    }
@@ -24,7 +23,7 @@ class HomePage extends StatelessWidget{
           ],
         ),
         body: Center(child: Text(
-          'LOGGED IN AS: '+ user!.email!,
+          'LOGGED IN AS: ${user!.email!}',
           style: TextStyle(
             fontSize: 20
           )
