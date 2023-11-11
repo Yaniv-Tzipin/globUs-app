@@ -32,7 +32,11 @@ class _NavigationExampleState extends State<NavigationExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Constants.COLOR_LIGHT_GREEN_1,
+        foregroundColor: Colors.grey[800],
+        leading: BackButton(color: Colors.grey[800]),
+        toolbarHeight: 40,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [IconButton(onPressed: signUserOut,
            icon: Icon(Icons.logout)
            ),
