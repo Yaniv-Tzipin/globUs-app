@@ -6,7 +6,7 @@ class UserProfile{
   late int age;
   late String originCountry;
   late String bio;
-  late profileImagePath;
+  late String profileImagePath;
 
   UserProfile(Map<String, dynamic> userData){
     firstName = userData['first_name'];
@@ -14,6 +14,6 @@ class UserProfile{
     age = calcAge(DateTime.fromMillisecondsSinceEpoch(userData['birth_date'].millisecondsSinceEpoch));
     originCountry = userData['country'];
     bio = userData['bio'];
-    profileImagePath = userData['profile_picture']; //todo
+    profileImagePath =userData['profile_image'];
   }
 }

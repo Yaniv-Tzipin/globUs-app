@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myfirstapp/models/user.dart';
 
-// todo - export to User class
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
@@ -19,7 +18,7 @@ class ProfilePage extends StatelessWidget {
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
-          return Text("Something went wrong");
+          return const Text("Something went wrong");
         }
 
         if (snapshot.hasData && !snapshot.data!.exists) {
@@ -29,10 +28,12 @@ class ProfilePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          return ProfileData(userProfile: UserProfile(data),);
+          return ProfileData(
+            userProfile: UserProfile(data),
+          );
         }
 
-        return Text("loading...");
+        return const Text("loading...");
       },
     );
   }
@@ -45,22 +46,60 @@ class ProfileData extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var imagePath =
-        'https://images.unsplash.com/photo-1554151228-14d9def656e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=333&q=80';
-
     return Scaffold(
       body: ListView(
-        physics: BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         children: [
-          ProfileWidget(
-            imagePath: imagePath,
-            onClicked: () async {},
-            firstName: userProfile.firstName,
-            age: userProfile.age, 
-            country: userProfile.originCountry,
+          Row(
+            children: [
+              ProfileWidget(
+                imagePath: userProfile.profileImagePath,
+                onClicked: () async {},
+                firstName: userProfile.firstName,
+                age: userProfile.age,
+                country: userProfile.originCountry,
+              ),
+              UserBasicDataWidget(
+                firstName: userProfile.firstName,
+                age: userProfile.age,
+                country: userProfile.originCountry,
+              )
+            ],
           )
         ],
       ),
+    );
+  }
+}
+
+class UserBasicDataWidget extends StatelessWidget {
+  final String firstName;
+  final int age;
+  final String country;
+
+  const UserBasicDataWidget(
+      {Key? key,
+      required this.firstName,
+      required this.age,
+      required this.country})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            "$firstName, $age",
+            style: const TextStyle(fontSize: 30),
+          ),
+        ),
+        Text(
+          "${country}",
+          style: const TextStyle(fontSize: 18, color: Colors.grey),
+        )
+      ],
     );
   }
 }
@@ -90,26 +129,11 @@ class ProfileWidget extends StatelessWidget {
           child: Stack(children: [
             buildImage(),
             Positioned(
-              child: buildIcon(color: const Color.fromARGB(255, 156, 204, 101)),
               bottom: 0,
-              right: 4,
+              right: 0,
+              child: buildIcon(color: const Color.fromARGB(255, 156, 204, 101)),
             ),
           ]),
-        ),
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Text(
-                "${firstName}, ${age}",
-                style: TextStyle(fontSize: 30),
-              ),
-            ),
-            Text(
-              "${country}",
-              style: TextStyle(fontSize: 18),
-            )
-          ],
         ),
       ],
     );
@@ -121,7 +145,7 @@ class ProfileWidget extends StatelessWidget {
       all: 3.0,
       child: buildCircle(
           color: color,
-          child: Icon(Icons.edit, color: Colors.white, size: 20),
+          child: const Icon(Icons.edit, color: Colors.white, size: 20),
           all: 8.0),
     );
   }
