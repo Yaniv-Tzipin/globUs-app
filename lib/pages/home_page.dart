@@ -3,7 +3,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
-import 'package:myfirstapp/components/constants.dart' as Constants;
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});

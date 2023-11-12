@@ -37,7 +37,7 @@ class MyTagsProvider extends ChangeNotifier{
   void removeTagFromChosen(Chip tag){
     Chip chosenToRemove = tag;
     for (Chip mytag in _chosenTags){ 
-      if(tag.key == mytag.key){
+      if(tag.label.toString() == mytag.label.toString()){
        chosenToRemove = mytag;
       }
     }
@@ -48,7 +48,7 @@ class MyTagsProvider extends ChangeNotifier{
   void removeTagFromPressed(MyTag tag){
     MyTag chosenToRemove = tag;
     for (MyTag mytag in pressedTags){ 
-      if(tag.key == mytag.key){
+      if(tag.text == mytag.text){
        chosenToRemove = mytag;
       }
     }

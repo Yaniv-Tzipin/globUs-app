@@ -17,3 +17,7 @@ class UserProfile{
     profileImagePath =userData['profile_image'];
   }
 }
+
+
+//what about tags?
+//country?
