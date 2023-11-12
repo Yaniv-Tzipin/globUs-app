@@ -31,7 +31,7 @@ class _AuthPageState extends State<AuthPage> {
                   builder:
                       (BuildContext context, AsyncSnapshot<dynamic> snapshot2) {
                     if (snapshot2.connectionState == ConnectionState.waiting) {
-                      return const LoginOrRegisterPage();
+                      return  LoginOrRegisterPage(showLoginPage: true,);
                     } else {
                       if (snapshot1.hasData) {
                         if (isNewUser) {
@@ -40,7 +40,7 @@ class _AuthPageState extends State<AuthPage> {
                           return HomePage();
                         }
                       } else {
-                        return const LoginOrRegisterPage();
+                        return  LoginOrRegisterPage(showLoginPage: true,);
                       }
                     }
                   }));

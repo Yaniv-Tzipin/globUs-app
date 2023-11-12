@@ -6,7 +6,7 @@ class MyTagsProvider extends ChangeNotifier{
   int _count = 0;
   final List<Chip> _chosenTags = [];
   int get count => _count;
-  List<Widget> get chosenTags => _chosenTags;
+  List<Chip> get chosenTags => _chosenTags;
 
   List<MyTag> pressedTags = [];
 

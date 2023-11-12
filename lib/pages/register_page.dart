@@ -33,6 +33,7 @@ class _RegisterState extends State<RegisterPage> {
     if(!passwordIsValid){
       showErrorMessage("passwords don't match");
     }
+
     else{
     // show sign up circle 
     showDialog(
@@ -58,16 +59,6 @@ class _RegisterState extends State<RegisterPage> {
     // navigate to continue register
     Get.to(ContinueRegister());
 
-
-    //!!!!! DONT FORGET TO ADD USERS' DETAILS!!!!!! use this method:
-  //   Future addUserDetails(String email) async{
-  //   await FirebaseFirestore.instance.collection('users').add({
-  //     'email': email,
-  //     'username': userNameController.text.trim(),
-  //     // to add fields
-  //   }
-  //   );
-  // }
 
     }on FirebaseAuthException catch (e){
 
