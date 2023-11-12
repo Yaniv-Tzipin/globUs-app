@@ -1,12 +1,13 @@
 import "package:flutter/material.dart";
 import "package:myfirstapp/pages/choose_tags_page.dart";
+import "package:myfirstapp/queries/users_quries.dart";
 
 
 class MyTagsProvider extends ChangeNotifier{
   int _count = 0;
   final List<Chip> _chosenTags = [];
   int get count => _count;
-  List<Widget> get chosenTags => _chosenTags;
+  List<Chip> get chosenTags => _chosenTags;
 
   List<MyTag> pressedTags = [];
 
@@ -28,6 +29,7 @@ class MyTagsProvider extends ChangeNotifier{
 
   void addTagToPressed(MyTag tag){
     pressedTags.add(tag);
+    UserQueries.usersTagsToString.add(tag.text);
     notifyListeners();
     
   }
@@ -51,6 +53,7 @@ class MyTagsProvider extends ChangeNotifier{
       }
     }
      pressedTags.remove(chosenToRemove); 
+     UserQueries.usersTagsToString.remove(chosenToRemove.text);
      notifyListeners();
   }
 
