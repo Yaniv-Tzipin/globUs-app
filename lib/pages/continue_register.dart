@@ -1,18 +1,22 @@
-import "package:cloud_firestore/cloud_firestore.dart";
-import "package:firebase_auth/firebase_auth.dart";
+
 import "package:flutter/material.dart";
+import "package:get/route_manager.dart"; 
+import "package:myfirstapp/components/choose_tags_button.dart";
 import "package:myfirstapp/components/my_button.dart";
 import "package:myfirstapp/components/my_date_picker.dart";
 import "package:myfirstapp/components/my_textfield.dart";
+import "package:myfirstapp/pages/choose_tags_page.dart";
+import "package:myfirstapp/pages/login_or_register_page.dart";
+
 
 class ContinueRegister extends StatefulWidget {
-  final String userMail;
-  final String userPassword;
-  final String userConfirmPassword;
+  //final String userMail;
+  // final String userPassword;
+  // final String userConfirmPassword;
   const ContinueRegister({super.key, 
-  required this.userMail,
-  required this.userPassword,
-  required this.userConfirmPassword,
+  // required this.userMail,
+  // required this.userPassword,
+  // required this.userConfirmPassword,
    });
 
   @override
@@ -23,85 +27,99 @@ class _ContinueRegisterState extends State<ContinueRegister> {
 
   final userNameController = TextEditingController();
   final myBioController = TextEditingController();
+  
+
+  //navigate to tags page
+  void chooseTags() async{
+   Get.to(const MyTags());
+  }
+
+  void goToLogInPage() async{
+    Get.to(const LoginOrRegisterPage());
+  }
 
   //sign user up method
-  void signUserUp() async{
+  void signUserUp() async{ // !!!!NEED TO CONSULT WITH NADAV/NOA
+  //   // check if passwords are matching
+  //   if(widget.userPassword != widget.userConfirmPassword){
+  //     showErrorMessage("passwords don't match");
+  //   }
+  //   else{
+  //   // show sign up circle 
+  //   showDialog(
+  //     context: context,
+  //      builder: (context){
+  //       return const Center(
+  //         child: CircularProgressIndicator(),
+  //       );
+  //      }
+  //     );
 
-    // check if passwords are matching
-    if(widget.userPassword != widget.userConfirmPassword){
-      showErrorMessage("passwords don't match");
-    }
-    else{
-    // show sign up circle 
-    showDialog(
-      context: context,
-       builder: (context){
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-       }
-      );
-
-    // try creating the user
-    try{
+  //   // try creating the user
+  //   try{
     
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: widget.userMail,
-      password: widget.userPassword
-      );
-    //pop the loading circle
-    Navigator.pop(context);
+  //     await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //     email: widget.userMail,
+  //     password: widget.userPassword
+  //     );
+  //   //pop the loading circle
+  //   Navigator.pop(context);
 
-    addUserDetails(widget.userMail.trim());
+  //   addUserDetails(widget.userMail.trim());
 
-     //go to home-page
-    Navigator.pop(context);
+  //    //go to home-page
+  //   Navigator.pop(context);
 
-    } on FirebaseAuthException catch (e){
+  //   } on FirebaseAuthException catch (e){
 
-    //pop the loading circle
-    Navigator.pop(context);
+  //   //pop the loading circle
+  //   Navigator.pop(context);
       
-    showErrorMessage(e.code);
+  //   showErrorMessage(e.code);
     
-    }
-  }
-  }
+  //   }
+  // }
+  // }
 
-  Future addUserDetails(String email) async{
-    await FirebaseFirestore.instance.collection('users').add({
-      'email': email,
-      'username': userNameController.text.trim(),
-      // to add fields
-    }
-    );
-  }
+  // Future addUserDetails(String email) async{
+  //   await FirebaseFirestore.instance.collection('users').add({
+  //     'email': email,
+  //     'username': userNameController.text.trim(),
+  //     // to add fields
+  //   }
+  //   );
+  // }
 
 
-  void showErrorMessage(String message){
-    showDialog(context: context,
-     builder: (context)
-     {
-      return AlertDialog(
-        backgroundColor: Color.fromARGB(255, 110, 138, 100),
-        title: Center(
-          child: Text(message,
-          style: TextStyle(color: Colors.white)
-          )
-        )
-      );
+  // void showErrorMessage(String message){
+  //   showDialog(context: context,
+  //    builder: (context)
+  //    {
+  //     return AlertDialog(
+  //       backgroundColor: Color.fromARGB(255, 110, 138, 100),
+  //       title: Center(
+  //         child: Text(message,
+  //         style: TextStyle(color: Colors.white)
+  //         )
+  //       )
+  //     );
 
-     }
-     );
+  //    }
+  //    );
+  // }
   }
  
   @override
   Widget build(BuildContext context) {
-    
     return  Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: IconButton(icon: const Icon(Icons.arrow_back),
+        onPressed: goToLogInPage,),
+        elevation: 0,
+        
       ),
-      backgroundColor: Color.fromARGB(225, 220, 232, 220),
+      backgroundColor: const Color.fromARGB(225, 220, 232, 220),
       body: 
       SafeArea(child: 
       Center(child: 
@@ -118,7 +136,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
 
             ),
           const SizedBox(height: 10),
-           MyDatePicker(),   
+           const MyDatePicker(),   
           const SizedBox(height: 10),
           MyTextField(
           controller: myBioController,
@@ -127,9 +145,14 @@ class _ContinueRegisterState extends State<ContinueRegister> {
             obscureText: false,
             prefixIcon: Icons.face,),
           const SizedBox(height: 10),
-          MyButton(onTap: signUserUp,
-           text: "Sign Up"),
+          //MyButton(onTap: chooseTags,
+           //text: "Choose Your Tags"),
+           GestureDetector(onTap: chooseTags,child: const MyTagsButton(),),
            const SizedBox(height: 10),
+          MyButton(onTap: signUserUp,
+           text: "Ready to Go"),
+           
+           
            
         ],
         )
