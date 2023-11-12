@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:myfirstapp/services/helpers.dart';
+import 'package:myfirstapp/models/user.dart';
 
 // todo - export to User class
 
@@ -30,7 +29,7 @@ class ProfilePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          return ProfileData(data);
+          return ProfileData(userProfile: UserProfile(data),);
         }
 
         return Text("loading...");
@@ -40,20 +39,12 @@ class ProfilePage extends StatelessWidget {
 }
 
 class ProfileData extends StatelessWidget {
-  Map<String, dynamic> userData = <String, dynamic>{};
+  late UserProfile userProfile;
 
-  ProfileData(Map<String, dynamic> data) {
-    userData = data;
-  }
+  ProfileData({super.key, required this.userProfile});
 
   @override
   Widget build(BuildContext context) {
-    var age = calcAge(DateTime.fromMillisecondsSinceEpoch(
-        userData['birth_date'].millisecondsSinceEpoch));
-    var firstName = userData['first_name'];
-    var username = userData['username'];
-    var country = userData['country'];
-    var bio = userData['bio'];
     var imagePath =
         'https://images.unsplash.com/photo-1554151228-14d9def656e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=333&q=80';
 
@@ -64,9 +55,9 @@ class ProfileData extends StatelessWidget {
           ProfileWidget(
             imagePath: imagePath,
             onClicked: () async {},
-            firstName: firstName,
-            age: age,
-            country: country,
+            firstName: userProfile.firstName,
+            age: userProfile.age, 
+            country: userProfile.originCountry,
           )
         ],
       ),
@@ -110,12 +101,12 @@ class ProfileWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(4.0),
               child: Text(
-                "${firstName}, 23",
+                "${firstName}, ${age}",
                 style: TextStyle(fontSize: 30),
               ),
             ),
             Text(
-              "Israel",
+              "${country}",
               style: TextStyle(fontSize: 18),
             )
           ],
