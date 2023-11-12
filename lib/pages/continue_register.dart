@@ -14,7 +14,7 @@ import "package:myfirstapp/pages/home_page.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart" as logi;
 import "package:myfirstapp/pages/login_or_register_page.dart";
 import "package:myfirstapp/pages/register_page.dart";
-import 'package:myfirstapp/queries/users_quries.dart' as userQueries;
+import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:myfirstapp/queries/completed_sign_in_queries.dart' as queries;
 import 'package:myfirstapp/validations/continue_register_page_validation.dart' as CRPV;
 
@@ -132,7 +132,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   Future<void> signUserUp() async {
     print(CRPV.validateFormFilled(context, userNameController.text, birthDateController.text, myBioController.text));
     if(CRPV.validateFormFilled(context, userNameController.text, birthDateController.text, myBioController.text)){
-    await userQueries.addNewUser(userMail, userNameController.text.trim(),
+    await UserQueries.addNewUser(userMail, userNameController.text.trim(),
         birthDateController.text, myBioController.text);
     await queries.addCompletedUser(userMail); //DONT FORGET TO ADD TAGS TO PROFILE
     Get.to(HomePage());

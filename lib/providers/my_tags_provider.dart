@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:myfirstapp/pages/choose_tags_page.dart";
+import "package:myfirstapp/queries/users_quries.dart";
 
 
 class MyTagsProvider extends ChangeNotifier{
@@ -28,6 +29,7 @@ class MyTagsProvider extends ChangeNotifier{
 
   void addTagToPressed(MyTag tag){
     pressedTags.add(tag);
+    UserQueries.usersTagsToString.add(tag.text);
     notifyListeners();
     
   }
@@ -51,6 +53,7 @@ class MyTagsProvider extends ChangeNotifier{
       }
     }
      pressedTags.remove(chosenToRemove); 
+     UserQueries.usersTagsToString.remove(chosenToRemove.text);
      notifyListeners();
   }
 
