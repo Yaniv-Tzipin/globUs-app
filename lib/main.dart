@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/pages/auth_page.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
-import 'package:myfirstapp/pages/loading_page.dart';
 import 'package:myfirstapp/pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:myfirstapp/providers/user_data_provider.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -33,9 +31,8 @@ class MyApp extends StatelessWidget {
     return  MultiProvider(
       providers: [
       ChangeNotifierProvider<MyTagsProvider>(create: (context) => MyTagsProvider(),),
-      ChangeNotifierProvider<UserDataProvider>(create: (context)=>UserDataProvider())
       ],
-      child: const GetMaterialApp(
+      child:  const GetMaterialApp(
         debugShowCheckedModeBanner: false,
         home: AuthPage()
       ),

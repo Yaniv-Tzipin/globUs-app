@@ -25,12 +25,6 @@ signInWithGoogle() async {
 
   bool isNewUser = await checkIfUserCompletedSigningUp();
 
-  
-  //route to the auth page 
-
-   //Get.to(const AuthPage());
-
-
  // finally, lets sign in
    return user;
 }

@@ -1,14 +1,10 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
 import 'package:myfirstapp/components/square_title.dart';
-import 'package:myfirstapp/pages/auth_page.dart';
 import 'package:myfirstapp/pages/forgot_pw_page.dart';
 import 'package:myfirstapp/services/auth_service.dart';
 
@@ -28,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void signUserIn() async{
+  Future<void> signUserIn() async{
 
     // show log in circle 
     showDialog(
@@ -48,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
     //pop the loading circle
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
-    Get.to(AuthPage()); 
+
     
     } on FirebaseAuthException catch (e){
 
@@ -67,10 +63,8 @@ class _LoginPageState extends State<LoginPage> {
         //show error to user
         otherError();
       
-      }
-      
+      }   
     }
-  
   }
 
   void wrongUsernameOrPasswordMessage(){

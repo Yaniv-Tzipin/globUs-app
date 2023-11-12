@@ -1,12 +1,11 @@
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
-import "package:myfirstapp/pages/loading_page.dart";
+import "package:myfirstapp/pages/continue_register.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart";
 import "package:myfirstapp/pages/home_page.dart";
 import 'package:myfirstapp/services/auth_service.dart';
 
-
-class AuthPage extends StatefulWidget{
+class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
 
   @override
@@ -14,30 +13,37 @@ class AuthPage extends StatefulWidget{
 }
 
 class _AuthPageState extends State<AuthPage> {
+  Stream<User?> authStream = FirebaseAuth.instance.authStateChanges();
+  late bool isNewUser;
+// update users' status (new or completed sign up proccess)
+  Future<void> getUserData() async {
+    isNewUser = await AuthService().checkIfUserCompletedSigningUp();
+  }
 
   @override
   Widget build(BuildContext context) {
-    
-    return Scaffold(
-      body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(), 
-        builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-          // user logged in
-          if(snapshot.hasData){
-
-            print('loading page');
-          
-            //!!!need to add check if user is signed-in:
-            //AuthService().checkIfUserCompletedSigningUp();//maybe use what Nadav said with disk memory
-            return const MyLoadingPage(); //MyLoadingPage();
-          }
-          // user not logged in
-          else{
-            print('login or register page');
-            return const LoginOrRegisterPage();
-          }
-        }
-        ),
-    );
+    return StreamBuilder(
+        stream: authStream,
+        builder: (BuildContext context, AsyncSnapshot<User?> snapshot1) {
+          return Center(
+              child: FutureBuilder(
+                  future: getUserData(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot2) {
+                    if (snapshot2.connectionState == ConnectionState.waiting) {
+                      return const LoginOrRegisterPage();
+                    } else {
+                      if (snapshot1.hasData) {
+                        if (isNewUser) {
+                          return const ContinueRegister();
+                        } else {
+                          return HomePage();
+                        }
+                      } else {
+                        return const LoginOrRegisterPage();
+                      }
+                    }
+                  }));
+        });
   }
 }
