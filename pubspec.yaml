@@ -43,6 +43,7 @@ dependencies:
   get: ^4.6.6
   image_picker: 0.7.4
   age_calculator: ^1.0.0
+  country_list_pick: ^1.0.1+6
   
 
 dev_dependencies:

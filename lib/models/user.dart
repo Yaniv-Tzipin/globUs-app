@@ -4,7 +4,7 @@ class UserProfile{
   late String firstName;
   late String lastName;
   late int age;
-  late String originCountry;
+  late String originCountry; //CONSIDER ADDING LOCATION SERVICES
   late String bio;
   late String profileImagePath;
 

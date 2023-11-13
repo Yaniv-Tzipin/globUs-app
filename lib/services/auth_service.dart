@@ -33,7 +33,7 @@ signInWithGoogle() async {
   Future<bool> checkIfUserCompletedSigningUp() async{
 
     // get users' mail 
-    String? userMail =  FirebaseAuth.instance.currentUser!.email;
+    String? userMail =  FirebaseAuth.instance.currentUser?.email;
 
     //Firebase query
     try {
