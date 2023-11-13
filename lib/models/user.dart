@@ -11,7 +11,7 @@ class UserProfile{
   UserProfile(Map<String, dynamic> userData){
     firstName = userData['first_name'];
     lastName = userData['last_name'];
-    age = calcAge(DateTime.fromMillisecondsSinceEpoch(userData['birth_date'].millisecondsSinceEpoch));
+    age = 23; //calcAge(DateTime.fromMillisecondsSinceEpoch(userData['birth_date'].millisecondsSinceEpoch));
     originCountry = userData['country'];
     bio = userData['bio'];
     profileImagePath =userData['profile_image'];

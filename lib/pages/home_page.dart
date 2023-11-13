@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -81,7 +82,7 @@ class _NavigationExampleState extends State<NavigationExample> {
         Container(
           color: Colors.blue,
           alignment: Alignment.center,
-          child: const Text('Page 3'), //TO ADD MESSAGES PAGE
+          child: MainChatPage(), //TO ADD MESSAGES PAGE
         ),
       ][currentPageIndex],
     );

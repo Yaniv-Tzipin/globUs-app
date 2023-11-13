@@ -6,6 +6,7 @@ import 'package:myfirstapp/components/my_country_picker.dart';
 import 'package:myfirstapp/pages/auth_page.dart';
 import 'package:myfirstapp/pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';

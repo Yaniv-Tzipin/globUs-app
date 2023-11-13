@@ -46,9 +46,6 @@ await FirebaseFirestore.instance.collection('users').doc(email).set({
 }
 
 
-
-
-
 // getters
 Future<String> getEmail() async {
 try {
