@@ -49,6 +49,9 @@ class ProfileData extends StatelessWidget {
     return Scaffold(
       body: ListView(
         physics: const BouncingScrollPhysics(),
+
+        // !!!!need to make sure that we stay in the safe zone!!!!
+
         children: [
           Row(
             children: [

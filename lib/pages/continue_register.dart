@@ -126,12 +126,13 @@ final String path = '${userMail}/${fileName}';
 try{
   final ref =  firebase_storage.FirebaseStorage.instance.ref().child(path);
   await ref.putFile(file);
+
+  //get valid url path
   String myURL = await ref.getDownloadURL();
+  //upload to the user's fields in FireStore the image path (that is in the storage)
   await _fireStore.collection('users').doc(userMail).set({
     'profile_image' :  myURL}, SetOptions(merge: true)
   );
-
-
 
 } catch(e){
   print(e);
@@ -152,6 +153,8 @@ try{
 
   //sign user up method
   Future<void> signUserUp() async {
+
+    //check if user filled all the neccesary fields
     if (CRPV.validateFormFilled(context, userNameController.text,
         birthDateController.text, myBioController.text,
         countryController.text)) {
@@ -161,11 +164,15 @@ try{
         );
       });
       
+      //add user's data to FireStore(except image URL which will happen seperately)
       await UserQueries.addNewUser(userMail, userNameController.text.trim(),
           birthDateController.text, myBioController.text, countryController.text);
+      //set user's status to completed register
       await queries.addCompletedUser(userMail);
+      //upload user's chosen image to firestore storage
       await uploadImage();
       Navigator.pop(context);
+      //finally, navigate to homepage
       Get.to(HomePage());
     }
   }
