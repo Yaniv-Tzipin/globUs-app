@@ -2,8 +2,8 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
-import 'package:myfirstapp/components/constants.dart' as Constants;
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -36,6 +36,7 @@ class _NavigationExampleState extends State<NavigationExample> {
 
     return Scaffold(   
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
         leading: BackButton(color: Colors.grey[800]),
         toolbarHeight: 40,
@@ -77,12 +78,12 @@ class _NavigationExampleState extends State<NavigationExample> {
         Container(
           color: Colors.green,
           alignment: Alignment.center,
-          child: const Text('Page 2'),
+          child: const Text('Page 2'), //TO ADD MATCHES GRID PAGE
         ),
         Container(
           color: Colors.blue,
           alignment: Alignment.center,
-          child: const Text('Page 3'),
+          child: MainChatPage(), 
         ),
       ][currentPageIndex],
     );
