@@ -1,5 +1,6 @@
 import "dart:io";
 
+import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:get/route_manager.dart";
@@ -14,8 +15,9 @@ import "package:myfirstapp/pages/home_page.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart";
 import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:myfirstapp/queries/completed_sign_in_queries.dart' as queries;
-import 'package:myfirstapp/validations/continue_register_page_validation.dart'
-    as CRPV;
+import 'package:myfirstapp/validations/continue_register_page_validation.dart'as CRPV;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import "package:path/path.dart" as Path;
 
 class ContinueRegister extends StatefulWidget {
   const ContinueRegister({
@@ -35,6 +37,7 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   PickedFile?
       _imageFile; // will hold the image the user chooses as profile picture
   final ImagePicker _picker = ImagePicker();
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   Widget imageProfile() {
     return Center(
@@ -111,6 +114,31 @@ class _ContinueRegisterState extends State<ContinueRegister> {
     });
   }
 
+Future<void> uploadImage() async{
+if(_imageFile == null){
+  return;
+}
+final File file = File(_imageFile!.path);
+final String fileName = Path.basename(_imageFile!.path);
+final String path = '${userMail}/${fileName}';
+
+//try upload the pic to the storage in FireBase
+try{
+  final ref =  firebase_storage.FirebaseStorage.instance.ref().child(path);
+  await ref.putFile(file);
+  String myURL = await ref.getDownloadURL();
+  await _fireStore.collection('users').doc(userMail).set({
+    'profile_image' :  myURL}, SetOptions(merge: true)
+  );
+
+
+
+} catch(e){
+  print(e);
+}
+}
+
+
   //navigate to tags page
   void chooseTags() async {
     Get.to(const MyTags());
@@ -127,9 +155,17 @@ class _ContinueRegisterState extends State<ContinueRegister> {
     if (CRPV.validateFormFilled(context, userNameController.text,
         birthDateController.text, myBioController.text,
         countryController.text)) {
+      showDialog(context: context, builder: (context){
+        return const Center(
+          child: CircularProgressIndicator()
+        );
+      });
+      
       await UserQueries.addNewUser(userMail, userNameController.text.trim(),
           birthDateController.text, myBioController.text, countryController.text);
       await queries.addCompletedUser(userMail);
+      await uploadImage();
+      Navigator.pop(context);
       Get.to(HomePage());
     }
   }

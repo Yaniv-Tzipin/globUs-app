@@ -54,13 +54,13 @@ class ProfileData extends StatelessWidget {
             children: [
               ProfileWidget(
                 imagePath: userProfile.profileImagePath,
-                onClicked: () async {},
-                firstName: userProfile.firstName,
+                onClicked: () async {}, // to allow change a profile pic
+                username: userProfile.username,
                 age: userProfile.age,
                 country: userProfile.originCountry,
               ),
               UserBasicDataWidget(
-                firstName: userProfile.firstName,
+                username: userProfile.username,
                 age: userProfile.age,
                 country: userProfile.originCountry,
               )
@@ -73,13 +73,13 @@ class ProfileData extends StatelessWidget {
 }
 
 class UserBasicDataWidget extends StatelessWidget {
-  final String firstName;
+  final String username;
   final int age;
   final String country;
 
   const UserBasicDataWidget(
       {Key? key,
-      required this.firstName,
+      required this.username,
       required this.age,
       required this.country})
       : super(key: key);
@@ -91,7 +91,7 @@ class UserBasicDataWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(4.0),
           child: Text(
-            "$firstName, $age",
+            "$username, $age",
             style: const TextStyle(fontSize: 30),
           ),
         ),
@@ -107,7 +107,7 @@ class UserBasicDataWidget extends StatelessWidget {
 class ProfileWidget extends StatelessWidget {
   final String imagePath;
   final VoidCallback onClicked;
-  final String firstName;
+  final String username;
   final int age;
   final String country;
 
@@ -115,7 +115,7 @@ class ProfileWidget extends StatelessWidget {
       {Key? key,
       required this.imagePath,
       required this.onClicked,
-      required this.firstName,
+      required this.username,
       required this.age,
       required this.country})
       : super(key: key);
