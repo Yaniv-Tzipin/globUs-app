@@ -36,6 +36,7 @@ class _NavigationExampleState extends State<NavigationExample> {
 
     return Scaffold(   
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
         leading: BackButton(color: Colors.grey[800]),
         toolbarHeight: 40,
@@ -82,7 +83,7 @@ class _NavigationExampleState extends State<NavigationExample> {
         Container(
           color: Colors.blue,
           alignment: Alignment.center,
-          child: MainChatPage(), //TO ADD MESSAGES PAGE
+          child: MainChatPage(), 
         ),
       ][currentPageIndex],
     );
