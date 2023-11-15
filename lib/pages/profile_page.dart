@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myfirstapp/models/user.dart';
+
 
 class ProfilePage extends StatelessWidget {
   ProfilePage({super.key});
@@ -16,7 +18,7 @@ class ProfilePage extends StatelessWidget {
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasError) {
-          return Text("Something went wrong");
+          return const Text("Something went wrong");
         }
 
         if (snapshot.hasData && !snapshot.data!.exists) {
@@ -26,27 +28,151 @@ class ProfilePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          return ProfileData(data);
+          return ProfileData(
+            userProfile: UserProfile(data),
+          );
         }
 
-        return Text("loading...");
+        return const Text("loading...");
       },
     );
   }
 }
 
 class ProfileData extends StatelessWidget {
-  Map<String, dynamic> userData = <String, dynamic>{};
+  late UserProfile userProfile;
 
-  ProfileData(Map<String, dynamic> data) {
-    userData = data;
-  }
+  ProfileData({super.key, required this.userProfile});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-          Center(child: Text("PROFILE first name: ${userData['first_name']}")),
+      body: ListView(
+        physics: const BouncingScrollPhysics(),
+
+        // !!!!need to make sure that we stay in the safe zone!!!!
+
+        children: [
+          Row(
+            children: [
+              ProfileWidget(
+                imagePath: userProfile.profileImagePath,
+                onClicked: () async {}, // to allow change a profile pic
+                username: userProfile.username,
+                age: userProfile.age,
+                country: userProfile.originCountry,
+              ),
+              UserBasicDataWidget(
+                username: userProfile.username,
+                age: userProfile.age,
+                country: userProfile.originCountry,
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class UserBasicDataWidget extends StatelessWidget {
+  final String username;
+  final int age;
+  final String country;
+
+  const UserBasicDataWidget(
+      {Key? key,
+      required this.username,
+      required this.age,
+      required this.country})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Text(
+            "$username, $age",
+            style: const TextStyle(fontSize: 30),
+          ),
+        ),
+        Text(
+          "${country}",
+          style: const TextStyle(fontSize: 18, color: Colors.grey),
+        )
+      ],
+    );
+  }
+}
+
+class ProfileWidget extends StatelessWidget {
+  final String imagePath;
+  final VoidCallback onClicked;
+  final String username;
+  final int age;
+  final String country;
+
+  const ProfileWidget(
+      {Key? key,
+      required this.imagePath,
+      required this.onClicked,
+      required this.username,
+      required this.age,
+      required this.country})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 40, 0),
+          child: Stack(children: [
+            buildImage(),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: buildIcon(color: const Color.fromARGB(255, 156, 204, 101)),
+            ),
+          ]),
+        ),
+      ],
+    );
+  }
+
+  Widget buildIcon({required Color color}) {
+    return buildCircle(
+      color: Colors.white,
+      all: 3.0,
+      child: buildCircle(
+          color: color,
+          child: const Icon(Icons.edit, color: Colors.white, size: 20),
+          all: 8.0),
+    );
+  }
+
+  Widget buildCircle(
+      {required Widget child, required Color color, required double all}) {
+    return ClipOval(
+      child: Container(
+        padding: EdgeInsets.all(all),
+        color: color,
+        child: child,
+      ),
+    );
+  }
+
+  Widget buildImage() {
+    final image = NetworkImage(imagePath);
+
+    return ClipOval(
+      child: Material(
+        color: Colors.transparent, // why?
+        child:
+            Ink.image(image: image, fit: BoxFit.cover, width: 128, height: 128),
+      ),
     );
   }
 }
