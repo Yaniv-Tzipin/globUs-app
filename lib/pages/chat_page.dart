@@ -8,9 +8,11 @@ import 'package:myfirstapp/services/chat/chat_services.dart';
 class ChatPage extends StatefulWidget {
   final String receiverUserEmail;
   final String receiverUsername;
-  const ChatPage({super.key,
-   required this.receiverUserEmail,
-    required this.receiverUsername});
+  const ChatPage(
+      {super.key,
+      required this.receiverUserEmail,
+      required this.receiverUsername});
+
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -20,102 +22,142 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  
 
-  void sendMessage() async{
+  void sendMessage() async {
+  // make sure the page scrolls down
+  // widget._scrollController.animateTo(
+  //   widget._scrollController.position.maxScrollExtent
+  //   , duration: const Duration(microseconds: 300), curve: Curves.easeOut);
     //only send if there's something to send
-    if(_messageController.text.isNotEmpty){
+    if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
-        widget.receiverUserEmail, _messageController.text);
+          widget.receiverUserEmail, _messageController.text);
       // clear the text controller after sending the message
       _messageController.clear();
     }
-
     
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.receiverUsername),
+        backgroundColor: const Color.fromARGB(255, 181, 213, 182),
+        elevation: 0,
       ),
-      body: Column(
-        children: [
-          // messages
-          Expanded(
-            child: _buildMessagesList()),
-          // user input
-          _buildMessageInput()
-        ]),
+      body: Column(children: [
+        // messages
+        Expanded(child: _buildMessagesList()),
+        // user input
+        _buildMessageInput(),
+      ]),
     );
   }
 
 // build message list
-Widget _buildMessagesList(){
-  return StreamBuilder(
-    stream: 
-    _chatService.getMessages(widget.receiverUserEmail, _firebaseAuth.currentUser!.email),
-     builder: (context,snapshot){
-      if(snapshot.hasError){
-        return Text('Error${snapshot.error}');
-      }
-      if(snapshot.connectionState == ConnectionState.waiting){
-        return const Text('loading..');
-      }
-      return ListView(
-        children: snapshot.data!.docs.map((document) => _buildMessageItem(document)).toList(),
-      );
+  Widget _buildMessagesList() {
 
-     }
-     );
-}
+    return StreamBuilder(
+        stream: _chatService.getMessages(
+            widget.receiverUserEmail, _firebaseAuth.currentUser!.email),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error${snapshot.error}');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('loading..');
+          }
+          return ListView(
+            // controller: widget._scrollController,
+            children: snapshot.data!.docs
+                .map((document) => _buildMessageItem(document))
+                .toList(),
+          );
+        });
+  }
 
 
 // build message item
-Widget _buildMessageItem(DocumentSnapshot document){
-  Map<String,dynamic> data = document.data() as Map<String, dynamic>;
+  Widget _buildMessageItem(DocumentSnapshot document) {
+    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-  // align the messages to the right if the sender is the current user, otherwise to the left
-  var alignment = (data['senderEmail'] == _firebaseAuth.currentUser!.email) 
-  ? Alignment.centerRight : Alignment.centerLeft;
+    // align the messages to the right if the sender is the current user, otherwise to the left
+    var alignment = (data['senderEmail'] == _firebaseAuth.currentUser!.email)
+        ? Alignment.centerRight
+        : Alignment.centerLeft;
 
-  return Container(
-    alignment: alignment,
-    child: Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: (data['senderEmail'] == _firebaseAuth.currentUser!.email)
-        ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        mainAxisAlignment:(data['senderEmail'] == _firebaseAuth.currentUser!.email)
-        ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          Text(data['senderUsername']),
-          ChatBubble(message: data['message'], data: data)
-        ]),
-    ),);
-}
+    return Container(
+      alignment: alignment,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+            crossAxisAlignment:
+                (data['senderEmail'] == _firebaseAuth.currentUser!.email)
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+            mainAxisAlignment:
+                (data['senderEmail'] == _firebaseAuth.currentUser!.email)
+                    ? MainAxisAlignment.end
+                    : MainAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment:
+                    (data['senderEmail'] == _firebaseAuth.currentUser!.email)
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                mainAxisAlignment:
+                    (data['senderEmail'] == _firebaseAuth.currentUser!.email)
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.start,
+                children: [
+                  Text(TimeOfDay.now().format(context)),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text(data['senderUsername'], style: const TextStyle(fontWeight: FontWeight.bold),),
+                ],
+              ),
+              const SizedBox(height: 5),
+              ChatBubble(message: data['message'], data: data)
+            ]),
+      ),
+    );
+  }
+
 
 // build message input
-Widget _buildMessageInput(){
-  return Row(
-    children: [
-      // text field
-      Expanded(child: MyTextField(
-        controller: _messageController,
-        hintText: 'Enter your message',
-        obscureText: false, maximumLines: 7, prefixIcon: Icons.message,)),
+  Widget _buildMessageInput() {
+    return Container(
+      height: 120,
+      decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 215, 234, 216),
+          ),
+      child: Row(
+        children: [
+          // text field
+          Expanded(
+              child: MyTextField(
+            controller: _messageController,
+            hintText: 'Enter your message',
+            obscureText: false,
+            maximumLines: 7,
+            prefixIcon: Icons.message,
+          )),
 
-      // send button
-      IconButton(
-        onPressed: sendMessage,
-        icon:  const Icon(Icons.arrow_upward,
-        size: 40,),
-      )
-      
-    ],
-  );
-}
-
-
-
+          // send button
+          Padding(
+            padding: const EdgeInsets.only(left: 0, right: 25),
+            child: IconButton(
+              onPressed: sendMessage,
+              icon: const Icon(Icons.arrow_upward,
+                  size: 40, color: Colors.white),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
