@@ -1,3 +1,4 @@
+import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/services/helpers.dart';
 
 class UserProfile{
@@ -6,6 +7,7 @@ class UserProfile{
   late String originCountry; //CONSIDER ADDING LOCATION SERVICES
   late String bio;
   late String profileImagePath;
+  late List<dynamic> tags;
 
   UserProfile(Map<String, dynamic> userData){
     username = userData['username'];
@@ -14,9 +16,8 @@ class UserProfile{
     originCountry = userData['country'];
     bio = userData['bio'];
     profileImagePath = userData['profile_image'] ?? "";
-   
+    tags = userData['tags'];   
   }
+
+
 }
-
-
-//what about tags?

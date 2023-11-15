@@ -1,12 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myfirstapp/components/profile_widget.dart';
+import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/models/user.dart';
+import 'package:myfirstapp/pages/edit_profile_page.dart';
 
-
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   ProfilePage({super.key});
 
+  final userEmail = FirebaseAuth.instance.currentUser!.email;
+
+  @override
+  _EvaluateProfilePageState createState() => _EvaluateProfilePageState();
+}
+
+class _EvaluateProfilePageState extends State<ProfilePage> {
   final userEmail = FirebaseAuth.instance.currentUser!.email;
 
   @override
@@ -28,9 +37,8 @@ class ProfilePage extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          return ProfileData(
-            userProfile: UserProfile(data),
-          );
+          currentUser = UserProfile(data);
+          return ValidProfilePage();
         }
 
         return const Text("loading...");
@@ -39,11 +47,14 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class ProfileData extends StatelessWidget {
-  late UserProfile userProfile;
+class ValidProfilePage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _ValidProfilePageState();
+  }
+}
 
-  ProfileData({super.key, required this.userProfile});
-
+class _ValidProfilePageState extends State<ValidProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,123 +67,50 @@ class ProfileData extends StatelessWidget {
           Row(
             children: [
               ProfileWidget(
-                imagePath: userProfile.profileImagePath,
-                onClicked: () async {}, // to allow change a profile pic
-                username: userProfile.username,
-                age: userProfile.age,
-                country: userProfile.originCountry,
-              ),
-              UserBasicDataWidget(
-                username: userProfile.username,
-                age: userProfile.age,
-                country: userProfile.originCountry,
-              )
-            ],
-          )
+                imagePath: currentUser.profileImagePath,
+                onClicked: () {
+                  // EditProfilePage();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => EditProfilePage()),
+                  );
+                },
+                ), 
+              buildUserBasicData()],
+          ),
+          SizedBox(height: 30),
+          buildAbout(currentUser.bio),
+          // TagsWidget(tagsStr: currentUser.tags),
         ],
       ),
     );
   }
-}
 
-class UserBasicDataWidget extends StatelessWidget {
-  final String username;
-  final int age;
-  final String country;
-
-  const UserBasicDataWidget(
-      {Key? key,
-      required this.username,
-      required this.age,
-      required this.country})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4.0),
-          child: Text(
-            "$username, $age",
-            style: const TextStyle(fontSize: 30),
-          ),
+  Widget buildAbout(String bio) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("About me",
+                style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+            SizedBox(height: 7),
+            Text(bio, style: TextStyle(fontSize: 17, height: 1.4)),
+          ],
         ),
-        Text(
-          "${country}",
-          style: const TextStyle(fontSize: 18, color: Colors.grey),
-        )
-      ],
-    );
-  }
-}
+      );
 
-class ProfileWidget extends StatelessWidget {
-  final String imagePath;
-  final VoidCallback onClicked;
-  final String username;
-  final int age;
-  final String country;
-
-  const ProfileWidget(
-      {Key? key,
-      required this.imagePath,
-      required this.onClicked,
-      required this.username,
-      required this.age,
-      required this.country})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 40, 0),
-          child: Stack(children: [
-            buildImage(),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: buildIcon(color: const Color.fromARGB(255, 156, 204, 101)),
+  Widget buildUserBasicData() => Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Text(
+              "${currentUser.username}, ${currentUser.age}",
+              style: const TextStyle(fontSize: 30),
             ),
-          ]),
-        ),
-      ],
-    );
-  }
-
-  Widget buildIcon({required Color color}) {
-    return buildCircle(
-      color: Colors.white,
-      all: 3.0,
-      child: buildCircle(
-          color: color,
-          child: const Icon(Icons.edit, color: Colors.white, size: 20),
-          all: 8.0),
-    );
-  }
-
-  Widget buildCircle(
-      {required Widget child, required Color color, required double all}) {
-    return ClipOval(
-      child: Container(
-        padding: EdgeInsets.all(all),
-        color: color,
-        child: child,
-      ),
-    );
-  }
-
-  Widget buildImage() {
-    final image = NetworkImage(imagePath);
-
-    return ClipOval(
-      child: Material(
-        color: Colors.transparent, // why?
-        child:
-            Ink.image(image: image, fit: BoxFit.cover, width: 128, height: 128),
-      ),
-    );
-  }
+          ),
+          Text(
+            currentUser.originCountry,
+            style: const TextStyle(fontSize: 18, color: Colors.grey),
+          )
+        ],
+      );
 }
