@@ -39,6 +39,10 @@ dependencies:
   firebase_auth: ^4.12.1
   google_sign_in: ^6.1.5
   cloud_firestore: ^4.12.2
+  provider: ^6.0.5
+  get: ^4.6.6
+  image_picker: 0.7.4
+  
   age_calculator: 
   google_fonts:
 

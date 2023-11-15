@@ -1,6 +1,5 @@
 // ignore_for_file: unnecessary_const, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/components/my_button.dart';
@@ -25,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final mailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void signUserIn() async{
+  Future<void> signUserIn() async{
 
     // show log in circle 
     showDialog(
@@ -36,18 +35,21 @@ class _LoginPageState extends State<LoginPage> {
         );
        }
       );
-    // try sign in
+    // try sign in, snapshot gets data
     try{
       await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: mailController.text,
       password: passwordController.text
       );
     //pop the loading circle
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
+
     
     } on FirebaseAuthException catch (e){
 
     //pop the loading circle
+    // ignore: use_build_context_synchronously
     Navigator.pop(context);
       
       //WRONG EMAIL OR PASSWORD
@@ -61,10 +63,8 @@ class _LoginPageState extends State<LoginPage> {
         //show error to user
         otherError();
       
-      }
-      
+      }   
     }
-  
   }
 
   void wrongUsernameOrPasswordMessage(){
@@ -222,7 +222,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                   // google button
-                  SquareTitle(onTap: () => AuthService().signInWithGoogle(),
+                  SquareTitle(onTap: () => {AuthService().signInWithGoogle()},
                   imagePath: 'lib/images/google.png'),
                   SizedBox(width:25),
           

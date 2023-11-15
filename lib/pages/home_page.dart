@@ -10,10 +10,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: NavigationExample());
+    return NavigationExample();
   }
 }
 
+  
+   
 class NavigationExample extends StatefulWidget {
   const NavigationExample({super.key});
 
@@ -24,13 +26,15 @@ class NavigationExample extends StatefulWidget {
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
 
+   //sign user out method, snapshot loosing data
   void signUserOut(){
     FirebaseAuth.instance.signOut();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+    return Scaffold(   
       appBar: AppBar(
         foregroundColor: Colors.grey[800],
         leading: BackButton(color: Colors.grey[800]),
