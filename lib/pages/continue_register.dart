@@ -15,6 +15,7 @@ import "package:myfirstapp/pages/home_page.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart";
 import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:myfirstapp/queries/completed_sign_in_queries.dart' as queries;
+import "package:myfirstapp/services/helpers.dart";
 import 'package:myfirstapp/validations/continue_register_page_validation.dart'as CRPV;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import "package:path/path.dart" as Path;
@@ -166,7 +167,8 @@ try{
       
       //add user's data to FireStore(except image URL which will happen seperately)
       await UserQueries.addNewUser(userMail, userNameController.text.trim(),
-          birthDateController.text, myBioController.text, countryController.text);
+          parseStringToTimestamp(birthDateController.text),
+          myBioController.text, countryController.text);
       //set user's status to completed register
       await queries.addCompletedUser(userMail);
       //upload user's chosen image to firestore storage
