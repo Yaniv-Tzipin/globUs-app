@@ -167,7 +167,8 @@ try{
       
       //add user's data to FireStore(except image URL which will happen seperately)
       await UserQueries.addNewUser(userMail, userNameController.text.trim(),
-         parseStringToTimestamp(birthDateController.text), myBioController.text, countryController.text);
+          parseStringToTimestamp(birthDateController.text),
+          myBioController.text, countryController.text);
       //set user's status to completed register
       await queries.addCompletedUser(userMail);
       //upload user's chosen image to firestore storage
