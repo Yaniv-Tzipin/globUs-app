@@ -3,16 +3,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/components/chat_bubble.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
+import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverUserEmail;
   final String receiverUsername;
+  final ScrollController scrollController;
+  final UserImageIcon userImageIcon;
   const ChatPage(
       {super.key,
       required this.receiverUserEmail,
-      required this.receiverUsername});
-
+      required this.receiverUsername,
+      required this.scrollController, required this.userImageIcon});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -22,13 +25,8 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  
 
   void sendMessage() async {
-  // make sure the page scrolls down
-  // widget._scrollController.animateTo(
-  //   widget._scrollController.position.maxScrollExtent
-  //   , duration: const Duration(microseconds: 300), curve: Curves.easeOut);
     //only send if there's something to send
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
@@ -36,14 +34,16 @@ class _ChatPageState extends State<ChatPage> {
       // clear the text controller after sending the message
       _messageController.clear();
     }
-    
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
+        actions: [Padding(
+          padding: const EdgeInsets.only(right: 30),
+          child: widget.userImageIcon,
+        )],
         title: Text(widget.receiverUsername),
         backgroundColor: const Color.fromARGB(255, 181, 213, 182),
         elevation: 0,
@@ -59,7 +59,6 @@ class _ChatPageState extends State<ChatPage> {
 
 // build message list
   Widget _buildMessagesList() {
-
     return StreamBuilder(
         stream: _chatService.getMessages(
             widget.receiverUserEmail, _firebaseAuth.currentUser!.email),
@@ -70,15 +69,20 @@ class _ChatPageState extends State<ChatPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('loading..');
           }
+          // Scroll to the bottom of the list tile
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            widget.scrollController.jumpTo(
+              widget.scrollController.position.maxScrollExtent,
+            );
+          });
           return ListView(
-            // controller: widget._scrollController,
+            controller: widget.scrollController,
             children: snapshot.data!.docs
                 .map((document) => _buildMessageItem(document))
                 .toList(),
           );
         });
   }
-
 
 // build message item
   Widget _buildMessageItem(DocumentSnapshot document) {
@@ -117,7 +121,10 @@ class _ChatPageState extends State<ChatPage> {
                   const SizedBox(
                     width: 10,
                   ),
-                  Text(data['senderUsername'], style: const TextStyle(fontWeight: FontWeight.bold),),
+                  Text(
+                    data['senderUsername'],
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               const SizedBox(height: 5),
@@ -127,14 +134,13 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-
 // build message input
   Widget _buildMessageInput() {
     return Container(
       height: 120,
       decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 215, 234, 216),
-          ),
+        color: Color.fromARGB(255, 215, 234, 216),
+      ),
       child: Row(
         children: [
           // text field
@@ -152,8 +158,8 @@ class _ChatPageState extends State<ChatPage> {
             padding: const EdgeInsets.only(left: 0, right: 25),
             child: IconButton(
               onPressed: sendMessage,
-              icon: const Icon(Icons.arrow_upward,
-                  size: 40, color: Colors.white),
+              icon:
+                  const Icon(Icons.arrow_upward, size: 40, color: Colors.white),
             ),
           )
         ],

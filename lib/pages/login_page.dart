@@ -233,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                 ],
                 ),
           
-                SizedBox(height:60),
+                SizedBox(height:10),
                   
                 //not a member? register now
                 Row(

@@ -6,7 +6,7 @@ import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({super.key});
+   HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

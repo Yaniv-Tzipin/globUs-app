@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +16,7 @@ class MainChatPage extends StatefulWidget {
 class _MainChatPageState extends State<MainChatPage> {
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,59 +47,59 @@ class _MainChatPageState extends State<MainChatPage> {
   }
 
 //get last message in chatroom
-Widget getLastMessage(String receiverMail){
-  String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
-  return StreamBuilder(
-   stream: _chatService.getMessages(currentUserMail, receiverMail),
-   builder:  (context, snapshot) {
+  Widget getLastMessage(String receiverMail) {
+    String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
+    return StreamBuilder(
+        stream: _chatService.getMessages(currentUserMail, receiverMail),
+        builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('Error${snapshot.error}');
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('loading..');
           }
-          try{
-          String message = snapshot.data!.docs.last.get('message');
+          try {
+            String message = snapshot.data!.docs.last.get('message');
 
-          // the prefix of the text will be you or the sender's username
-          String prefix;
-          if(snapshot.data!.docs.last.get('senderEmail') == currentUserMail){
-            prefix = 'You:';
-          }
-          else{
-            prefix = snapshot.data!.docs.last.get('senderUsername')+':';
-          }
+            // the prefix of the text will be you or the sender's username
+            String prefix;
+            if (snapshot.data!.docs.last.get('senderEmail') ==
+                currentUserMail) {
+              prefix = 'You:';
+            } else {
+              prefix = snapshot.data!.docs.last.get('senderUsername') + ':';
+            }
 
-          return Text('$prefix $message', overflow: TextOverflow.ellipsis,);
-          
+            return Text(
+              '$prefix $message',
+              overflow: TextOverflow.ellipsis,
+            );
+          } catch (e) {
+            return const Text('Don\'t be shy, start a conversation 😇', style: TextStyle(fontWeight: FontWeight.bold),);
           }
-          catch(e){
-            return const Text('');
-          }
-        }
-   );
-}
- 
-  
+        });
+  }
 
 // build individual user list items
   Widget buildUserListItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-
+    ScrollController scrollController = ScrollController();
+    UserImageIcon userImageIcon = UserImageIcon(userMail: data['email']);
   
 
     // dsisplay all users except current one
     if (FirebaseAuth.instance.currentUser?.email != data['email']) {
       return ListTile(
-        //receiver's profile image
-        leading: UserImageIcon(userMail: data['email']),
-        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          //receiver's profile image
+          leading: userImageIcon,
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
           shape: const RoundedRectangleBorder(
             side: BorderSide(color: Colors.white, width: 0.3),
           ),
           tileColor: const Color.fromARGB(255, 228, 236, 232),
           // show user's username
-          title: Text(data['username']), 
+          title: Text(data['username']),
           // show last message sent
           subtitle: getLastMessage(data['email']),
           // pass the clicked user's email to the chat page
@@ -109,14 +107,14 @@ Widget getLastMessage(String receiverMail){
                 Get.to(ChatPage(
                   receiverUserEmail: data['email'],
                   receiverUsername: data['username'],
+                  scrollController: scrollController,
+                  userImageIcon: userImageIcon
                 ))
               });
     } else {
       return Container();
     }
   }
-
-  
 }
 
 //this section is responsible for showing the profile images of the users:
@@ -128,63 +126,54 @@ class UserImageIcon extends StatefulWidget {
   State<UserImageIcon> createState() => _UserImageIconState();
 }
 
-
-
 class _UserImageIconState extends State<UserImageIcon> {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
-  final String ConstImageURL = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcU50X1UOeDaphmUyD6T8ROKs-HjeirpOoapiWbC9cLAqewFy1gthrgUTB9E7nKjRwOVk&usqp=CAU';
+  final String ConstImageURL =
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcU50X1UOeDaphmUyD6T8ROKs-HjeirpOoapiWbC9cLAqewFy1gthrgUTB9E7nKjRwOVk&usqp=CAU';
   late String usersImagePath;
 
-
-  Future<void> loadImage()async {
-
-    try{
-    usersImagePath = await _fireStore.collection('users').doc(widget.userMail).get().then((snapshot){
+  Future<void> loadImage() async {
+    try {
+      usersImagePath = await _fireStore
+          .collection('users')
+          .doc(widget.userMail)
+          .get()
+          .then((snapshot) {
         return snapshot.data()!['profile_image'].toString();
-      
-    });
-    if(usersImagePath == ''){
+      });
+      if (usersImagePath == '') {
+        usersImagePath = ConstImageURL;
+      }
+    } catch (e) {
       usersImagePath = ConstImageURL;
     }
-    }
-    catch(e){
-      usersImagePath = ConstImageURL;
-    }
-
-    
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-    future: loadImage(),
-     builder: (context,snapshot){
-      if(snapshot.connectionState == ConnectionState.waiting){
-        return const SizedBox(
-          width: 60,
-          height: 60,
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-        } 
-        return SizedBox(
-          width:60,
-          height: 60,
-          child: buildImage());
-      }
-    );
+        future: loadImage(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+              width: 60,
+              height: 60,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          return SizedBox(width: 60, height: 60, child: buildImage());
+        });
   }
 
-
-    Widget buildImage() {
+  Widget buildImage() {
     final image = NetworkImage(usersImagePath);
 
     return ClipOval(
       child: Material(
         color: Colors.transparent, // why?
-        child:
-            Ink.image(image: image, fit: BoxFit.cover, width: 0, height: 0),
+        child: Ink.image(image: image, fit: BoxFit.cover, width: 0, height: 0),
       ),
     );
   }
