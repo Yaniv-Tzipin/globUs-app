@@ -34,7 +34,7 @@ await FirebaseFirestore.instance.collection('users').add({'bio': bio});
 }
 
 static Future  <void> addNewUser(
-String email, String username, String birthdate, String bio, String country) async {
+String email, String username, Timestamp birthdate, String bio, String country) async {
 await FirebaseFirestore.instance.collection('users').doc(email).set({
 'email': email,
 'username': username,
