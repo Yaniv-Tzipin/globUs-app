@@ -16,20 +16,46 @@ class MainChatPage extends StatefulWidget {
 class _MainChatPageState extends State<MainChatPage> {
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  List<String> allOtherUsernames = [];
+  List<String> filteredItems = [];
+  String _query = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('All my matches'),
-        ),
-        body: buildUserList());
+          backgroundColor: Colors.blue,
+            toolbarHeight: 75,
+            title: Column(
+              children: [
+                const Text('All my matches'),
+                TextField(
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (value) {
+                    search(value);
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.white),
+                    fillColor: Colors.white,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            )),
+        body: createBody());
   }
 
-  //build a list of users except for the current logged in user
-  //!! IN THE FUTURE NEEDS TO BE CHANGED TO ONLY MATCHS !!
+//build a list of users except for the current logged in user
+//!! IN THE FUTURE NEEDS TO BE CHANGED TO ONLY MATCHS !!
 
   Widget buildUserList() {
+// initiating allOtherUsernames to an empty list
+// so that befor every new query this list will be cleaned
+    allOtherUsernames = [];
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('users').snapshots(),
         builder: (context, snapshot) {
@@ -61,7 +87,7 @@ class _MainChatPageState extends State<MainChatPage> {
           try {
             String message = snapshot.data!.docs.last.get('message');
 
-            // the prefix of the text will be you or the sender's username
+// the prefix of the text will be you or the sender's username
             String prefix;
             if (snapshot.data!.docs.last.get('senderEmail') ==
                 currentUserMail) {
@@ -75,7 +101,10 @@ class _MainChatPageState extends State<MainChatPage> {
               overflow: TextOverflow.ellipsis,
             );
           } catch (e) {
-            return const Text('Don\'t be shy, start a conversation 😇', style: TextStyle(fontWeight: FontWeight.bold),);
+            return const Text(
+              'Don\'t be shy, start a conversation 😇',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            );
           }
         });
   }
@@ -85,34 +114,75 @@ class _MainChatPageState extends State<MainChatPage> {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     ScrollController scrollController = ScrollController();
     UserImageIcon userImageIcon = UserImageIcon(userMail: data['email']);
-  
 
-    // dsisplay all users except current one
+// dsisplay all users except current one
     if (FirebaseAuth.instance.currentUser?.email != data['email']) {
-      return ListTile(
-          //receiver's profile image
-          leading: userImageIcon,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-          shape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.white, width: 0.3),
-          ),
-          tileColor: const Color.fromARGB(255, 228, 236, 232),
-          // show user's username
-          title: Text(data['username']),
-          // show last message sent
-          subtitle: getLastMessage(data['email']),
-          // pass the clicked user's email to the chat page
-          onTap: () => {
-                Get.to(ChatPage(
-                  receiverUserEmail: data['email'],
-                  receiverUsername: data['username'],
-                  scrollController: scrollController,
-                  userImageIcon: userImageIcon
-                ))
-              });
+      allOtherUsernames.add(data['username']);
+// when filteredItems is empty, no query was called yet, so display
+// all other usernames. If filteredItems is not empty, there are results
+// for the search query so show just these results
+      if (filteredItems.isEmpty || filteredItems.contains(data['username'])) {
+        return ListTile(
+//receiver's profile image
+            leading: userImageIcon,
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+            shape: const RoundedRectangleBorder(
+              side: BorderSide(color: Colors.white, width: 0.3),
+            ),
+            tileColor: const Color.fromARGB(255, 228, 236, 232),
+// show user's username
+            title: Text(data['username']),
+// show last message sent
+            subtitle: getLastMessage(data['email']),
+// pass the clicked user's email to the chat page
+            onTap: () => {
+                  Get.to(ChatPage(
+                      receiverUserEmail: data['email'],
+                      receiverUsername: data['username'],
+                      scrollController: scrollController,
+                      userImageIcon: userImageIcon))
+                });
+      } else {
+        return Container();
+      }
     } else {
       return Container();
+    }
+  }
+
+// this method adds the search functionality
+// when a user apply a search query he will be shown only the relevant results.
+  void search(String query) {
+    setState(
+      () {
+        _query = query;
+// filteredItems will hold just the users that match the query
+        filteredItems = allOtherUsernames
+            .where(
+              (item) => item.toLowerCase().startsWith(
+                    query.toLowerCase(),
+                  ),
+            )
+            .toList();
+      },
+    );
+  }
+
+// This method will determine what will be shown in the main_chat_page
+  Widget createBody() {
+// if the user did not search anything yet, show him all options
+// if the user searched something and there are results, show him the compatible options.
+    if (_query.isEmpty || _query.isNotEmpty && filteredItems.isNotEmpty) {
+      return buildUserList();
+    }
+// The user searched something but there are no results
+    else {
+      return const Center(
+          child: Text(
+        'No Results Found',
+        style: TextStyle(fontSize: 18),
+      ));
     }
   }
 }
