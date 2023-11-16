@@ -15,6 +15,8 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   Stream<User?> authStream = FirebaseAuth.instance.authStateChanges();
   late bool isNewUser;
+
+
 // update users' status (new or completed sign up proccess)
   Future<void> getUserData() async {
     isNewUser = await AuthService().checkIfUserCompletedSigningUp();
