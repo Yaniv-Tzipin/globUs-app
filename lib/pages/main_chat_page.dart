@@ -24,23 +24,23 @@ class _MainChatPageState extends State<MainChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color.fromARGB(255, 228, 236, 232),
             toolbarHeight: 75,
             title: Column(
               children: [
-                const Text('All my matches'),
                 TextField(
                   style: const TextStyle(color: Colors.white),
                   onChanged: (value) {
                     search(value);
                   },
                   decoration: const InputDecoration(
+                    border: InputBorder.none,
                     hintText: 'Search...',
-                    hintStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.black,),
                     fillColor: Colors.white,
                     prefixIcon: Icon(
                       Icons.search,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -132,7 +132,13 @@ class _MainChatPageState extends State<MainChatPage> {
             ),
             tileColor: const Color.fromARGB(255, 228, 236, 232),
 // show user's username
-            title: Text(data['username']),
+            title: Row(
+              children: [
+                Text(data['username']),
+                const SizedBox(width: 5),
+                //online or offline status
+                statusIcon(data)
+                ]),
 // show last message sent
             subtitle: getLastMessage(data['email']),
 // pass the clicked user's email to the chat page
@@ -149,6 +155,33 @@ class _MainChatPageState extends State<MainChatPage> {
     } else {
       return Container();
     }
+  }
+
+// build an icon based on the user's status
+  Widget statusIcon(Map<String, dynamic> data){
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').doc().snapshots(),
+      builder: (context,snapshot){
+        try{
+        if(snapshot.data != null){
+          Color iconColor = (data['status'] == 'Online') ? Colors.green : Colors.grey;
+          return Icon(Icons.circle,
+          color: iconColor,
+          size: 12,);   
+          }
+          else{
+            return const Icon(Icons.circle,
+          color: Colors.grey,
+          size: 12,);
+          }
+        }
+        catch(e){
+          return const Icon(Icons.circle,
+          color: Colors.grey,
+          size: 12,); 
+        }
+      }
+      );
   }
 
 // this method adds the search functionality
