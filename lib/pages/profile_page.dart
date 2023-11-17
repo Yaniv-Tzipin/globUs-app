@@ -7,9 +7,7 @@ import 'package:myfirstapp/models/user.dart';
 import 'package:myfirstapp/pages/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  ProfilePage({super.key});
-
-  final userEmail = FirebaseAuth.instance.currentUser!.email;
+  const ProfilePage({super.key});
 
   @override
   _EvaluateProfilePageState createState() => _EvaluateProfilePageState();
