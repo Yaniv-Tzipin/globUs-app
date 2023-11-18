@@ -167,7 +167,7 @@ class _MainChatPageState extends State<MainChatPage> {
     // did not read in his chat with the current other user
     int unread = 0;
     return StreamBuilder(
-        stream: _chatService.getChatRooms(currentUserMail, receiverMail),
+        stream: _chatService.getChatRooms(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Text('Error${snapshot.error}');

@@ -1,12 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
+import 'package:myfirstapp/services/chat/chat_services.dart';
 
 class HomePage extends StatelessWidget {
-   HomePage({super.key});
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +16,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-  
-   
 class NavigationExample extends StatefulWidget {
   const NavigationExample({super.key});
 
@@ -23,19 +23,19 @@ class NavigationExample extends StatefulWidget {
   State<NavigationExample> createState() => _NavigationExampleState();
 }
 
-class _NavigationExampleState extends State<NavigationExample>{ 
+class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
+  final ChatService _chatService = ChatService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-
-   //sign user out method, snapshot loosing data
-  void signUserOut(){
+  //sign user out method, snapshot loosing data
+  void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(   
+    return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
@@ -43,11 +43,10 @@ class _NavigationExampleState extends State<NavigationExample>{
         toolbarHeight: 40,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [IconButton(onPressed: signUserOut,
-           icon: Icon(Icons.logout)
-           ),
-          ],
-        ),
+        actions: [
+          IconButton(onPressed: signUserOut, icon: Icon(Icons.logout)),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
@@ -56,7 +55,7 @@ class _NavigationExampleState extends State<NavigationExample>{
         },
         indicatorColor: Colors.amber[800],
         selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
+        destinations: <Widget>[
           NavigationDestination(
             icon: Icon(Icons.person),
             label: 'Profile',
@@ -65,9 +64,31 @@ class _NavigationExampleState extends State<NavigationExample>{
             icon: Icon(Icons.favorite),
             label: 'Matches',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.message),
-            label: 'Messages',
+          Stack(
+            children: [
+              NavigationDestination(
+                icon: Icon(Icons.message),
+                label: 'Messages',
+              ),
+              Positioned(
+                right: 30,
+                top: 8,
+                child: Container(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 14,
+                    minHeight: 14,
+                  ),
+                  child: 
+                    totalUnreadMessagesCount(
+                  ),
+                ),
+              )
+            ],
           ),
         ],
       ),
@@ -84,10 +105,51 @@ class _NavigationExampleState extends State<NavigationExample>{
         Container(
           color: Colors.blue,
           alignment: Alignment.center,
-          child: MainChatPage(), 
+          child: MainChatPage(),
         ),
       ][currentPageIndex],
     );
   }
-}
 
+  Widget totalUnreadMessagesCount() {
+    String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
+    int currentUnread = 0;
+    int totalUnread = 0;
+    return StreamBuilder(
+        stream: _chatService.getChatRooms(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error${snapshot.error}');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('loading..');
+          }
+          try {
+            // from all the docs (chatRoom ids) get just those that
+            // contain the current username. These are the chats he is part of
+            var currentDocs = snapshot.data!.docs
+                .where((element) => element.id.contains(currentUserMail));
+            for (var doc in currentDocs) {
+              // getting the number of unread messages
+              try {
+                Map infoDict = doc.data() as Map;
+                currentUnread = infoDict['${currentUserMail}_unread'];
+                totalUnread += currentUnread;
+              } catch (e) {
+                currentUnread = 0;
+              }
+            }
+            return Text(
+              totalUnread.toString(),
+              style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 15.0,
+                fontWeight: FontWeight.w800,
+              ),
+            );
+          } catch (e) {
+            return Text('');
+          }
+        });
+  }
+}

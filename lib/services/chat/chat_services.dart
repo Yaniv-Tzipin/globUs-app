@@ -75,7 +75,7 @@ class ChatService extends ChangeNotifier {
   }
 
   // Get ChatRooms
-  Stream<QuerySnapshot> getChatRooms(String userEmail, otherUserEmail) {
+  Stream<QuerySnapshot> getChatRooms() {
     return _fireStore.collection('chat_rooms').snapshots();
   }
 
@@ -120,4 +120,8 @@ class ChatService extends ChangeNotifier {
     // the chat room unique id is a sorted combination of sender's and receiver's Emails
     return emails.join("_");
   }
+  
+  
 }
+
+
