@@ -42,6 +42,7 @@ class _ChatPageState extends State<ChatPage> {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
     // the user opened the chat so updating the unread messages num to zero
     _chatService.updateUnreadMessagesCount(currentUserMail, widget.receiverUserEmail, 0);
+    
     return Scaffold(
       appBar: AppBar(
         actions: [Padding(

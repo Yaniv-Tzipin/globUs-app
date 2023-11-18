@@ -25,6 +25,8 @@ class NavigationExample extends StatefulWidget {
 
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
+  int totalUnread = 0;
+
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -110,11 +112,11 @@ class _NavigationExampleState extends State<NavigationExample> {
       ][currentPageIndex],
     );
   }
-
+  //this method shows how many unread messages the user have
   Widget totalUnreadMessagesCount() {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
     int currentUnread = 0;
-    int totalUnread = 0;
+    totalUnread = 0;
     return StreamBuilder(
         stream: _chatService.getChatRooms(),
         builder: (context, snapshot) {
@@ -129,11 +131,16 @@ class _NavigationExampleState extends State<NavigationExample> {
             // contain the current username. These are the chats he is part of
             var currentDocs = snapshot.data!.docs
                 .where((element) => element.id.contains(currentUserMail));
-            for (var doc in currentDocs) {
+            for (var doc in currentDocs.toSet()) {
               // getting the number of unread messages
               try {
                 Map infoDict = doc.data() as Map;
                 currentUnread = infoDict['${currentUserMail}_unread'];
+                if (currentUnread > 0)
+                {
+                  print(doc.id);
+                  print(currentUnread);
+                }
                 totalUnread += currentUnread;
               } catch (e) {
                 currentUnread = 0;

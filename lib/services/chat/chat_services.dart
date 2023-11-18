@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/models/message.dart';
+import 'package:myfirstapp/pages/home_page.dart';
 
 class ChatService extends ChangeNotifier {
   //get instance of auth and firestore
@@ -59,7 +60,7 @@ class ChatService extends ChangeNotifier {
     }
     
     // updating unread messages info
-    updateUnreadMessagesCount(currentUserEmail, receiverEmail, 1);
+    await updateUnreadMessagesCount(currentUserEmail, receiverEmail, 1);
   }
 
 // Get Messages
@@ -82,7 +83,7 @@ class ChatService extends ChangeNotifier {
   // a method that updates the number of unread messages into firebase 
   // if the user sent a message, add param will be equal to one. 
   // Otherwise it will be zero.
-  void updateUnreadMessagesCount(
+  Future <void> updateUnreadMessagesCount(
       String currentUserEmail, String receiverEmail, int add) async {
     try {
       String uniqueChatRoomID = getChatRoomId(currentUserEmail, receiverEmail);
@@ -120,8 +121,6 @@ class ChatService extends ChangeNotifier {
     // the chat room unique id is a sorted combination of sender's and receiver's Emails
     return emails.join("_");
   }
-  
-  
-}
 
+}
 
