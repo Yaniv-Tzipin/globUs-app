@@ -62,13 +62,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
               height: 20,
             ),
             TextFieldWithTitleWidget(
-                label: 'Username',
-                text: currentUser.username,
-                controller: usernameController),
-            SizedBox(
-              height: 20,
-            ),
-            TextFieldWithTitleWidget(
               label: 'About Me',
               text: currentUser.bio,
               maxLines: 5,
