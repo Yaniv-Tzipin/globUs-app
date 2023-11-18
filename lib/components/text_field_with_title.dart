@@ -4,6 +4,7 @@ class TextFieldWithTitleWidget extends StatefulWidget {
   final int maxLines;
   final String label;
   final String text;
+  final TextEditingController controller;
   // final ValueChanged<String> onChanged;
 
   const TextFieldWithTitleWidget({
@@ -11,27 +12,27 @@ class TextFieldWithTitleWidget extends StatefulWidget {
     this.maxLines = 1,
     required this.label,
     required this.text,
+    required this.controller,
     // required this.onChanged,
   }) : super(key: key);
 
   @override
   _TextFieldWithTitleWidgetState createState() =>
-      _TextFieldWithTitleWidgetState();
+      _TextFieldWithTitleWidgetState(controller : controller, hintText: text);
 }
 
 class _TextFieldWithTitleWidgetState extends State<TextFieldWithTitleWidget> {
-  late final TextEditingController controller;
+  final TextEditingController controller;
+  final String hintText;
 
-  @override
-  void initState() {
-    super.initState();
-
-    controller = TextEditingController(text: widget.text);
-  }
+  _TextFieldWithTitleWidgetState({Key? key,
+  required this.controller,
+  required this.hintText,
+  }) : super();
 
   @override
   void dispose() {
-    controller.dispose();
+    this.controller.dispose();
 
     super.dispose();
   }
@@ -50,6 +51,8 @@ class _TextFieldWithTitleWidgetState extends State<TextFieldWithTitleWidget> {
           TextField(
             controller: controller,
             decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(color: Colors.grey[400]),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),

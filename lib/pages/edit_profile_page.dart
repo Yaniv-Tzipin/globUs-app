@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
 import 'package:myfirstapp/globals.dart';
@@ -10,14 +12,34 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final usernameController = TextEditingController();
+  final bioController = TextEditingController();
+
   void signUserOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+  void updateDB() async {
+    Map<String, TextEditingController> controllers = {
+      "bio": bioController
+    };
+    for (MapEntry<String, TextEditingController> entry in controllers.entries) {
+      TextEditingController controller = entry.value;
+      if (controller.text.isNotEmpty) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.email)
+            .update({entry.key: controller.text});
+      }
+    }
+    //todo: once Save is pressed, reload profile page automatically
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(  //todo export to createAppBar func
+      appBar: AppBar(
+        // todo: export to createAppBar() func
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
         leading: BackButton(color: Colors.grey[800]),
@@ -36,10 +58,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 imagePath: currentUser.profileImagePath,
                 onClicked: () async {},
                 isEdit: true),
-            SizedBox(height: 20,),
-            TextFieldWithTitleWidget(label: 'username', text: currentUser.username),
-            SizedBox(height: 20,),
-            TextFieldWithTitleWidget(label: 'About Me', text: currentUser.bio, maxLines: 5,)
+            SizedBox(
+              height: 20,
+            ),
+            TextFieldWithTitleWidget(
+                label: 'Username',
+                text: currentUser.username,
+                controller: usernameController),
+            SizedBox(
+              height: 20,
+            ),
+            TextFieldWithTitleWidget(
+              label: 'About Me',
+              text: currentUser.bio,
+              maxLines: 5,
+              controller: bioController,
+            ),
+            SizedBox(height: 30),
+            MyButton(onTap: updateDB, text: 'Save'),
           ]),
     );
   }

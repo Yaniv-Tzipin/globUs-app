@@ -2,6 +2,7 @@ import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/services/helpers.dart';
 
 class UserProfile{
+  late String email;
   late String username;
   late int age;
   late String originCountry; //CONSIDER ADDING LOCATION SERVICES
@@ -10,6 +11,7 @@ class UserProfile{
   late List<dynamic> tags;
 
   UserProfile(Map<String, dynamic> userData){
+    email = userData['email'];
     username = userData['username'];
     //!!! to talk with Noa about this 
     age = 23; //calcAge(DateTime.fromMillisecondsSinceEpoch(userData['birth_date'].millisecondsSinceEpoch));
