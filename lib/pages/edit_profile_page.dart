@@ -17,10 +17,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final usernameController = TextEditingController();
   final bioController = TextEditingController();
 
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
   void updateDB() async {
     Map<String, TextEditingController> controllers = {
       "bio": bioController
@@ -41,16 +37,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // todo: export to createAppBar() func
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
         leading: BackButton(color: Colors.grey[800]),
         toolbarHeight: 40,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout)),
-        ],
       ),
       body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20),
