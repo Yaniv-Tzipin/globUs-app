@@ -1,8 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
