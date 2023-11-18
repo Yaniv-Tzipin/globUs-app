@@ -65,10 +65,11 @@ class _MainChatPageState extends State<MainChatPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('loading');
           }
-          return ListView(
-              children: snapshot.data!.docs
+          List<Widget> listOfChats = snapshot.data!.docs
                   .map<Widget>((doc) => buildUserListItem(doc))
-                  .toList());
+                  .toList();
+          return ListView(
+              children: listOfChats);
         });
   }
 
@@ -118,7 +119,7 @@ class _MainChatPageState extends State<MainChatPage> {
 // dsisplay all users except current one
     if (FirebaseAuth.instance.currentUser?.email != data['email']) {
       allOtherUsernames.add(data['username']);
-// when filteredItems is empty, no query was called yet, so display
+// when filteredItems is empty, no query was called yet, so displaygit 
 // all other usernames. If filteredItems is not empty, there are results
 // for the search query so show just these results
       if (filteredItems.isEmpty || filteredItems.contains(data['username'])) {
@@ -220,7 +221,7 @@ class _MainChatPageState extends State<MainChatPage> {
   }
 }
 
-//this section is responsible for showing the profile images of the users:
+//this section is responsible for showing the profile images of the users
 class UserImageIcon extends StatefulWidget {
   final String userMail;
   const UserImageIcon({super.key, required this.userMail});
@@ -279,5 +280,10 @@ class _UserImageIconState extends State<UserImageIcon> {
         child: Ink.image(image: image, fit: BoxFit.cover, width: 0, height: 0),
       ),
     );
-  }
+  } 
+
+
 }
+
+
+
