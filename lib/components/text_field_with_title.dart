@@ -32,7 +32,7 @@ class _TextFieldWithTitleWidgetState extends State<TextFieldWithTitleWidget> {
 
   @override
   void dispose() {
-    this.controller.dispose();
+    controller.dispose();
 
     super.dispose();
   }

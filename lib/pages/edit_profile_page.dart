@@ -7,6 +7,8 @@ import 'package:myfirstapp/components/text_field_with_title.dart';
 import 'package:myfirstapp/globals.dart';
 
 class EditProfilePage extends StatefulWidget {
+  const EditProfilePage({super.key});
+
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -47,18 +49,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
-          IconButton(onPressed: signUserOut, icon: Icon(Icons.logout)),
+          IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout)),
         ],
       ),
       body: ListView(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          physics: BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          physics: const BouncingScrollPhysics(),
           children: [
             ProfileWidget(
                 imagePath: currentUser.profileImagePath,
                 onClicked: () async {},
                 isEdit: true),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             TextFieldWithTitleWidget(
@@ -67,7 +69,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               maxLines: 5,
               controller: bioController,
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             MyButton(onTap: updateDB, text: 'Save'),
           ]),
     );

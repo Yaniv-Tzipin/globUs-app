@@ -1,4 +1,3 @@
-import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/services/helpers.dart';
 
 class UserProfile{
