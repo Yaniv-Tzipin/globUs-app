@@ -24,23 +24,23 @@ class _MainChatPageState extends State<MainChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color.fromARGB(255, 228, 236, 232),
             toolbarHeight: 75,
             title: Column(
               children: [
-                const Text('All my matches'),
                 TextField(
                   style: const TextStyle(color: Colors.white),
                   onChanged: (value) {
                     search(value);
                   },
                   decoration: const InputDecoration(
+                    border: InputBorder.none,
                     hintText: 'Search...',
-                    hintStyle: TextStyle(color: Colors.white),
+                    hintStyle: TextStyle(color: Colors.black,),
                     fillColor: Colors.white,
                     prefixIcon: Icon(
                       Icons.search,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -65,10 +65,11 @@ class _MainChatPageState extends State<MainChatPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('loading');
           }
-          return ListView(
-              children: snapshot.data!.docs
+          List<Widget> listOfChats = snapshot.data!.docs
                   .map<Widget>((doc) => buildUserListItem(doc))
-                  .toList());
+                  .toList();
+          return ListView(
+              children: listOfChats);
         });
   }
 
@@ -118,7 +119,7 @@ class _MainChatPageState extends State<MainChatPage> {
 // dsisplay all users except current one
     if (FirebaseAuth.instance.currentUser?.email != data['email']) {
       allOtherUsernames.add(data['username']);
-// when filteredItems is empty, no query was called yet, so display
+// when filteredItems is empty, no query was called yet, so displaygit 
 // all other usernames. If filteredItems is not empty, there are results
 // for the search query so show just these results
       if (filteredItems.isEmpty || filteredItems.contains(data['username'])) {
@@ -132,7 +133,13 @@ class _MainChatPageState extends State<MainChatPage> {
             ),
             tileColor: const Color.fromARGB(255, 228, 236, 232),
 // show user's username
-            title: Text(data['username']),
+            title: Row(
+              children: [
+                Text(data['username']),
+                const SizedBox(width: 5),
+                //online or offline status
+                statusIcon(data)
+                ]),
 // show last message sent
             subtitle: getLastMessage(data['email']),
 // pass the clicked user's email to the chat page
@@ -149,6 +156,33 @@ class _MainChatPageState extends State<MainChatPage> {
     } else {
       return Container();
     }
+  }
+
+// build an icon based on the user's status
+  Widget statusIcon(Map<String, dynamic> data){
+    return StreamBuilder<DocumentSnapshot>(
+      stream: FirebaseFirestore.instance.collection('users').doc().snapshots(),
+      builder: (context,snapshot){
+        try{
+        if(snapshot.data != null){
+          Color iconColor = (data['status'] == 'Online') ? Colors.green : Colors.grey;
+          return Icon(Icons.circle,
+          color: iconColor,
+          size: 12,);   
+          }
+          else{
+            return const Icon(Icons.circle,
+          color: Colors.grey,
+          size: 12,);
+          }
+        }
+        catch(e){
+          return const Icon(Icons.circle,
+          color: Colors.grey,
+          size: 12,); 
+        }
+      }
+      );
   }
 
 // this method adds the search functionality
@@ -187,7 +221,7 @@ class _MainChatPageState extends State<MainChatPage> {
   }
 }
 
-//this section is responsible for showing the profile images of the users:
+//this section is responsible for showing the profile images of the users
 class UserImageIcon extends StatefulWidget {
   final String userMail;
   const UserImageIcon({super.key, required this.userMail});
@@ -246,5 +280,10 @@ class _UserImageIconState extends State<UserImageIcon> {
         child: Ink.image(image: image, fit: BoxFit.cover, width: 0, height: 0),
       ),
     );
-  }
+  } 
+
+
 }
+
+
+

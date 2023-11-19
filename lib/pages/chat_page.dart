@@ -93,6 +93,7 @@ class _ChatPageState extends State<ChatPage> {
     var alignment = (data['senderEmail'] == _firebaseAuth.currentUser!.email)
         ? Alignment.centerRight
         : Alignment.centerLeft;
+    Timestamp timeOfMessage = data['timestamp'];
 
     return Container(
       alignment: alignment,
@@ -118,7 +119,7 @@ class _ChatPageState extends State<ChatPage> {
                         ? MainAxisAlignment.end
                         : MainAxisAlignment.start,
                 children: [
-                  Text(TimeOfDay.now().format(context)),
+                  Text('${timeOfMessage.toDate().hour}:${timeOfMessage.toDate().minute}'),
                   const SizedBox(
                     width: 10,
                   ),

@@ -18,15 +18,41 @@ class HomePage extends StatelessWidget {
 
   
    
-class NavigationExample extends StatefulWidget {
+class NavigationExample extends StatefulWidget{
   const NavigationExample({super.key});
 
   @override
   State<NavigationExample> createState() => _NavigationExampleState();
 }
 
-class _NavigationExampleState extends State<NavigationExample>{ 
+class _NavigationExampleState extends State<NavigationExample> with WidgetsBindingObserver{ 
   int currentPageIndex = 0;
+  String pageTitle = "";
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+  final userMail = FirebaseAuth.instance.currentUser?.email;
+
+  @override
+  void initState(){
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  void setStatus(String status) async{
+     await _fireStore.collection('users').doc(userMail).update({
+      'status': status
+    },);
+
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    if(state == AppLifecycleState.resumed){
+      setStatus('Online');
+    }
+    else{
+      setStatus('Offline');
+    }
+  }
 
 
    //sign user out method, snapshot loosing data
@@ -39,9 +65,10 @@ class _NavigationExampleState extends State<NavigationExample>{
 
     return Scaffold(   
       appBar: AppBar(
+        title: Text(pageTitle, style: TextStyle(fontSize: 20,
+        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 139, 189, 139)),),
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
-        leading: BackButton(color: Colors.grey[800]),
         toolbarHeight: 40,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -54,6 +81,16 @@ class _NavigationExampleState extends State<NavigationExample>{
         onDestinationSelected: (int index) {
           setState(() {
             currentPageIndex = index;
+            //change the title of the tool bar according to the page
+            if(currentPageIndex == 0){
+              pageTitle = '';
+            }
+            if(currentPageIndex == 1){
+              pageTitle = 'Find some travel partners';
+            }
+            if(currentPageIndex == 2){
+              pageTitle = 'All my matches';
+            }
           });
         },
         indicatorColor: Colors.amber[800],
