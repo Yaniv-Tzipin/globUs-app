@@ -40,16 +40,15 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
-    // the user opened the chat so updating the unread messages num to zero
-    _chatService.updateUnreadMessagesCount(
-        currentUserMail, widget.receiverUserEmail, 0);
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
+              // the user opened the chat so updating the unread messages num to zero
+              _chatService.updateUnreadMessagesCount(
+                  currentUserMail, widget.receiverUserEmail, 0);
               _chatService.totalUnreadMessagesCount();
               Navigator.pop(context);
             }),
@@ -133,7 +132,8 @@ class _ChatPageState extends State<ChatPage> {
                         ? MainAxisAlignment.end
                         : MainAxisAlignment.start,
                 children: [
-                  Text('${timeOfMessage.toDate().hour}:${timeOfMessage.toDate().minute}'),
+                  Text(
+                      '${timeOfMessage.toDate().hour}:${timeOfMessage.toDate().minute}'),
                   const SizedBox(
                     width: 10,
                   ),
