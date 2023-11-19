@@ -58,6 +58,7 @@ class _NavigationExampleState extends State<NavigationExample> with WidgetsBindi
    //sign user out method, snapshot loosing data
   void signUserOut(){
     FirebaseAuth.instance.signOut();
+    setStatus('Offline');
   }
 
   @override
