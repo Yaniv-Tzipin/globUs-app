@@ -15,7 +15,8 @@ class ChatPage extends StatefulWidget {
       {super.key,
       required this.receiverUserEmail,
       required this.receiverUsername,
-      required this.scrollController, required this.userImageIcon});
+      required this.scrollController,
+      required this.userImageIcon});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -25,7 +26,6 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   final ChatService _chatService = ChatService();
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  
 
   void sendMessage() async {
     //only send if there's something to send
@@ -41,14 +41,24 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
     // the user opened the chat so updating the unread messages num to zero
-    _chatService.updateUnreadMessagesCount(currentUserMail, widget.receiverUserEmail, 0);
-    
+    _chatService.updateUnreadMessagesCount(
+        currentUserMail, widget.receiverUserEmail, 0);
+
     return Scaffold(
       appBar: AppBar(
-        actions: [Padding(
-          padding: const EdgeInsets.only(right: 30),
-          child: widget.userImageIcon,
-        )],
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              _chatService.totalUnreadMessagesCount();
+              Navigator.pop(context);
+            }),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 30),
+            child: widget.userImageIcon,
+          )
+        ],
         title: Text(widget.receiverUsername),
         backgroundColor: const Color.fromARGB(255, 181, 213, 182),
         elevation: 0,

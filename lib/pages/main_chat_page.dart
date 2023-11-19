@@ -176,22 +176,22 @@ class _MainChatPageState extends State<MainChatPage> {
           }
           try {
             // generating the current chatRoom id
-            uniqueChatRoomID = _chatService.getChatRoomId(currentUserMail, receiverMail);
+            uniqueChatRoomID =
+                _chatService.getChatRoomId(currentUserMail, receiverMail);
 
             // from all the docs (chatRoom ids) get just the one that equals
             // to the current uniqueChatRoomID
-            var currentDoc = snapshot.data!.docs.
-            singleWhere((element) => element.id == uniqueChatRoomID);
-                // .where((element) => element.id == uniqueChatRoomID);
-          //  for (var doc in currentDocs) {
-              // getting the number of unread messages
-              try {
-                Map infoDict = currentDoc.data() as Map;
-                unread = infoDict['${currentUserMail}_unread'];
-              } catch (e) {
-                unread = 0;
-              }
+            var currentDoc = snapshot.data!.docs
+                .singleWhere((element) => element.id == uniqueChatRoomID);
+
+            // getting the number of unread messages
+            try {
+              Map infoDict = currentDoc.data() as Map;
+              unread = infoDict['${currentUserMail}_unread'];
+            } catch (e) {
+              unread = 0;
             }
+
             return Text(
               unread.toString(),
               style: const TextStyle(

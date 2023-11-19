@@ -121,5 +121,47 @@ class ChatService extends ChangeNotifier {
     return emails.join("_");
   }
 
+    //this method shows how many unread messages the user have
+  Widget totalUnreadMessagesCount() {
+    String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
+    return StreamBuilder(
+        stream: getChatRooms(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error${snapshot.error}');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('loading..');
+          }
+          try {
+            int currentUnread = 0;
+            int totalUnread = 0;
+            // from all the docs (chatRoom ids) get just those that
+            // contain the current username. These are the chats he is part of
+            var currentDocs = snapshot.data!.docs
+                .where((element) => element.id.contains(currentUserMail));
+            for (var doc in currentDocs.toSet()) {
+              // getting the number of unread messages
+              try {
+                Map infoDict = doc.data() as Map;
+                currentUnread = infoDict['${currentUserMail}_unread'];
+                totalUnread += currentUnread;
+              } catch (e) {
+                currentUnread = 0;
+              }
+            }
+            return Text(
+              totalUnread.toString(),
+              style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 15.0,
+                fontWeight: FontWeight.w800,
+              ),
+            );
+          } catch (e) {
+            return Text('');
+          }
+        });
+  }
 }
 
