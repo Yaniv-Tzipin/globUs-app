@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:myfirstapp/components/chat_bubble.dart';
 import 'package:myfirstapp/pages/chat_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 
@@ -73,6 +72,52 @@ class _MainChatPageState extends State<MainChatPage> {
         });
   }
 
+  // build individual user list items
+  Widget buildUserListItem(DocumentSnapshot document) {
+    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    ScrollController scrollController = ScrollController();
+    UserImageIcon userImageIcon = UserImageIcon(userMail: data['email']);
+
+    // display all users except current one
+    if (FirebaseAuth.instance.currentUser?.email != data['email']) {
+      allOtherUsernames.add(data['username']);
+      // when filteredItems is empty, no query was called yet, so display
+      // all other usernames. If filteredItems is not empty, there are results
+      // for the search query so show just these results
+      if (filteredItems.isEmpty || filteredItems.contains(data['username'])) {
+        return ListTile(
+            //receiver's profile image
+            leading: userImageIcon,
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+            shape: const RoundedRectangleBorder(
+              side: BorderSide(color: Colors.white, width: 0.3),
+            ),
+            tileColor: const Color.fromARGB(255, 228, 236, 232),
+            // show user's username
+            title: Row(children: [
+              Text(data['username']),
+              const SizedBox(width: 5), 
+              statusIcon(data)
+            ]),
+            // show last message sent
+            subtitle: getLastMessage(data['email']),
+            // pass the clicked user's email to the chat page
+            onTap: () => {
+                  Get.to(ChatPage(
+                      receiverUserEmail: data['email'],
+                      receiverUsername: data['username'],
+                      scrollController: scrollController,
+                      userImageIcon: userImageIcon))
+                });
+      } else {
+        return Container();
+      }
+    } else {
+      return Container();
+    }
+  }
+
 //get last message in chatroom
   Widget getLastMessage(String receiverMail) {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
@@ -97,9 +142,16 @@ class _MainChatPageState extends State<MainChatPage> {
               prefix = snapshot.data!.docs.last.get('senderUsername') + ':';
             }
 
-            return Text(
-              '$prefix $message',
-              overflow: TextOverflow.ellipsis,
+            return Row(
+              children: [
+                Text(
+                  '$prefix $message',
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(width: 10),
+                // adding the number of unread messages
+                getUnreadCount(receiverMail)
+              ],
             );
           } catch (e) {
             return const Text(
@@ -110,52 +162,51 @@ class _MainChatPageState extends State<MainChatPage> {
         });
   }
 
-// build individual user list items
-  Widget buildUserListItem(DocumentSnapshot document) {
-    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    ScrollController scrollController = ScrollController();
-    UserImageIcon userImageIcon = UserImageIcon(userMail: data['email']);
+  Widget getUnreadCount(String receiverMail) {
+    String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
+    String uniqueChatRoomID;
+    // this will hold the number of messages the current user
+    // did not read in his chat with the current other user
+    int unread = 0;
+    return StreamBuilder(
+        stream: _chatService.getChatRooms(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Error${snapshot.error}');
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text('loading..');
+          }
+          try {
+            // generating the current chatRoom id
+            uniqueChatRoomID =
+                _chatService.getChatRoomId(currentUserMail, receiverMail);
 
-// dsisplay all users except current one
-    if (FirebaseAuth.instance.currentUser?.email != data['email']) {
-      allOtherUsernames.add(data['username']);
-// when filteredItems is empty, no query was called yet, so displaygit 
-// all other usernames. If filteredItems is not empty, there are results
-// for the search query so show just these results
-      if (filteredItems.isEmpty || filteredItems.contains(data['username'])) {
-        return ListTile(
-//receiver's profile image
-            leading: userImageIcon,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            shape: const RoundedRectangleBorder(
-              side: BorderSide(color: Colors.white, width: 0.3),
-            ),
-            tileColor: const Color.fromARGB(255, 228, 236, 232),
-// show user's username
-            title: Row(
-              children: [
-                Text(data['username']),
-                const SizedBox(width: 5),
-                //online or offline status
-                statusIcon(data)
-                ]),
-// show last message sent
-            subtitle: getLastMessage(data['email']),
-// pass the clicked user's email to the chat page
-            onTap: () => {
-                  Get.to(ChatPage(
-                      receiverUserEmail: data['email'],
-                      receiverUsername: data['username'],
-                      scrollController: scrollController,
-                      userImageIcon: userImageIcon))
-                });
-      } else {
-        return Container();
-      }
-    } else {
-      return Container();
-    }
+            // from all the docs (chatRoom ids) get just the one that equals
+            // to the current uniqueChatRoomID
+            var currentDoc = snapshot.data!.docs
+                .singleWhere((element) => element.id == uniqueChatRoomID);
+
+            // getting the number of unread messages
+            try {
+              Map infoDict = currentDoc.data() as Map;
+              unread = infoDict['${currentUserMail}_unread'];
+            } catch (e) {
+              unread = 0;
+            }
+
+            return Text(
+              unread.toString(),
+              style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 15.0,
+                fontWeight: FontWeight.w800,
+              ),
+            );
+          } catch (e) {
+            return Container();
+          }
+        });
   }
 
 // build an icon based on the user's status

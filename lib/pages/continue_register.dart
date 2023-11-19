@@ -116,15 +116,21 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   }
 
 Future<void> uploadImage() async{
-if(_imageFile == null){
-  return;
-}
-final File file = File(_imageFile!.path);
-final String fileName = Path.basename(_imageFile!.path);
+const String defaultProfileImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
+final String chosenPath = _imageFile?.path ?? defaultProfileImage;
+final File file = File(chosenPath);
+final String fileName = Path.basename(chosenPath);
 final String path = '${userMail}/${fileName}';
 
 //try upload the pic to the storage in FireBase
 try{
+  if(chosenPath == defaultProfileImage){
+    _fireStore.collection('users').doc(userMail).set({
+    'profile_image' :  chosenPath}, SetOptions(merge: true)
+  );
+    
+  }
+  else{
   final ref =  firebase_storage.FirebaseStorage.instance.ref().child(path);
   await ref.putFile(file);
 
@@ -134,6 +140,7 @@ try{
   await _fireStore.collection('users').doc(userMail).set({
     'profile_image' :  myURL}, SetOptions(merge: true)
   );
+  }
 
 } catch(e){
   print(e);
