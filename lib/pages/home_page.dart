@@ -136,11 +136,11 @@ class _NavigationExampleState extends State<NavigationExample> {
               try {
                 Map infoDict = doc.data() as Map;
                 currentUnread = infoDict['${currentUserMail}_unread'];
-                if (currentUnread > 0)
-                {
-                  print(doc.id);
-                  print(currentUnread);
-                }
+                // if (currentUnread > 0)
+                // {
+                //   print(doc.id);
+                //   print(currentUnread);
+                // }
                 totalUnread += currentUnread;
               } catch (e) {
                 currentUnread = 0;

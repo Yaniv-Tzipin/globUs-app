@@ -161,7 +161,6 @@ class _MainChatPageState extends State<MainChatPage> {
 
   Widget getUnreadCount(String receiverMail) {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
-    List<String> emails;
     String uniqueChatRoomID;
     // this will hold the number of messages the current user
     // did not read in his chat with the current other user
@@ -181,12 +180,13 @@ class _MainChatPageState extends State<MainChatPage> {
 
             // from all the docs (chatRoom ids) get just the one that equals
             // to the current uniqueChatRoomID
-            var currentDocs = snapshot.data!.docs
-                .where((element) => element.id == uniqueChatRoomID);
-            for (var doc in currentDocs) {
+            var currentDoc = snapshot.data!.docs.
+            singleWhere((element) => element.id == uniqueChatRoomID);
+                // .where((element) => element.id == uniqueChatRoomID);
+          //  for (var doc in currentDocs) {
               // getting the number of unread messages
               try {
-                Map infoDict = doc.data() as Map;
+                Map infoDict = currentDoc.data() as Map;
                 unread = infoDict['${currentUserMail}_unread'];
               } catch (e) {
                 unread = 0;
