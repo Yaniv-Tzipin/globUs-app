@@ -40,7 +40,6 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
