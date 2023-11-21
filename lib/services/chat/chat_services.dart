@@ -46,17 +46,35 @@ class ChatService extends ChangeNotifier {
         .doc(uniqueChatRoomID)
         .collection('messages')
         .add(newMessage.toMap());
-
+    
+ 
     var res =
         await _fireStore.collection('chat_rooms').doc(uniqueChatRoomID).get();
     // checking if the doc fields regarding unread messages don't exist
     // if so we add them 
-    if (res.data() == null) {
+
+
+  
+    if (res.data() == null) { 
       await FirebaseFirestore.instance
           .collection('chat_rooms')
           .doc(uniqueChatRoomID)
-          .set({'${currentUserEmail}_unread': 0, '${receiverEmail}_unread': 0});
+          .set({'${currentUserEmail}_unread': 0, '${receiverEmail}_unread': 0}, SetOptions(merge: true));
     }
+
+    //update some fields field
+    await _fireStore.collection('chat_rooms').doc(uniqueChatRoomID).set({
+      'lastMessageTimeStamp': timestamp,
+      'firstEmail': currentUserEmail,
+      'firstUsername': currentUsername,
+      'secondEmail': receiverEmail,
+      'secondUsername': receiverUsername
+
+    }, SetOptions(merge: true));
+    
+
+  
+
     
     // updating unread messages info
     await updateUnreadMessagesCount(currentUserEmail, receiverEmail, 1);
@@ -76,8 +94,15 @@ class ChatService extends ChangeNotifier {
 
   // Get ChatRooms
   Stream<QuerySnapshot> getChatRooms() {
-    return _fireStore.collection('chat_rooms').snapshots();
+    return _fireStore.collection('chat_rooms').snapshots(includeMetadataChanges: true);
   }
+
+  // Get all ChatRomms ordered by timestamo
+  Stream<QuerySnapshot> getChatRoomsByTimestamp() {
+    String currentUserEmail = _firebaseAuth.currentUser?.email ?? "";
+    return _fireStore.collection('chat_rooms').orderBy('lastMessageTimeStamp', descending: true).snapshots();
+  }
+
 
   // a method that updates the number of unread messages into firebase 
   // if the user sent a message, add param will be equal to one. 
@@ -103,7 +128,7 @@ class ChatService extends ChangeNotifier {
             .set({
           '${currentUserEmail}_unread': 0,
           '${receiverEmail}_unread': recieverUnread + add
-        });
+        }, SetOptions(merge: true));
       }
     } catch (e) {
       print(e);

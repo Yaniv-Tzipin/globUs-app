@@ -29,11 +29,14 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage() async {
     //only send if there's something to send
-    if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-          widget.receiverUserEmail, _messageController.text);
+    if (_messageController.text.isNotEmpty) { 
+      String message = _messageController.text;
       // clear the text controller after sending the message
       _messageController.clear();
+      await _chatService.sendMessage(
+          widget.receiverUserEmail, message);
+      
+      
     }
   }
 

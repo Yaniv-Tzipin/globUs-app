@@ -23,19 +23,21 @@ class _MainChatPageState extends State<MainChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 228, 236, 232),
+            backgroundColor: const Color.fromARGB(255, 228, 236, 232),
             toolbarHeight: 75,
             title: Column(
               children: [
                 TextField(
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                   onChanged: (value) {
                     search(value);
                   },
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Search...',
-                    hintStyle: TextStyle(color: Colors.black,),
+                    hintStyle: TextStyle(
+                      color: Colors.black,
+                    ),
                     fillColor: Colors.white,
                     prefixIcon: Icon(
                       Icons.search,
@@ -56,7 +58,7 @@ class _MainChatPageState extends State<MainChatPage> {
 // so that befor every new query this list will be cleaned
     allOtherUsernames = [];
     return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').snapshots(), //this stream will be changes soon
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('error');
@@ -64,27 +66,47 @@ class _MainChatPageState extends State<MainChatPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Text('loading');
           }
-          List<Widget> listOfChats = snapshot.data!.docs
-                  .map<Widget>((doc) => buildUserListItem(doc))
-                  .toList();
-          return ListView(
-              children: listOfChats);
+          return StreamBuilder(
+            stream: _chatService.getChatRoomsByTimestamp(),
+            builder: (context,snapshot1)
+            {
+              if (snapshot1.hasError) {
+            return const Text('error');
+          }
+          if (snapshot1.connectionState == ConnectionState.waiting) {
+            return const Text('loading');
+          }
+           List<Widget> listOfChats = snapshot1.data!.docs
+              .map<Widget>((doc) => buildUserListItem(doc, true))
+              .toList();
+          
+          return ListView(children: listOfChats);
+            });
+
+
+         
         });
   }
 
   // build individual user list items
-  Widget buildUserListItem(DocumentSnapshot document) {
+  Widget buildUserListItem(DocumentSnapshot document, bool isExistingChatRoom) {
+  try{
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     ScrollController scrollController = ScrollController();
-    UserImageIcon userImageIcon = UserImageIcon(userMail: data['email']);
+    String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
+    String receiverMail = (data['firstEmail'] == currentUserMail) ? data['secondEmail'] : data['firstEmail'];
+    String receiverUsername = (data['firstEmail'] == currentUserMail) ? data['secondUsername'] : data['firstUsername'];
+    UserImageIcon userImageIcon = UserImageIcon(userMail: receiverMail);
 
     // display all users except current one
-    if (FirebaseAuth.instance.currentUser?.email != data['email']) {
-      allOtherUsernames.add(data['username']);
+    if (FirebaseAuth.instance.currentUser?.email != receiverMail 
+    // making sure to get only the chat rooms that the current user is part of
+    && (data['firstEmail'] == currentUserMail || data['secondEmail'] == currentUserMail)) {
+      allOtherUsernames.add(receiverUsername);
       // when filteredItems is empty, no query was called yet, so display
       // all other usernames. If filteredItems is not empty, there are results
       // for the search query so show just these results
-      if (filteredItems.isEmpty || filteredItems.contains(data['username'])) {
+      if (filteredItems.isEmpty || filteredItems.contains(receiverUsername)) {
         return ListTile(
             //receiver's profile image
             leading: userImageIcon,
@@ -94,19 +116,25 @@ class _MainChatPageState extends State<MainChatPage> {
               side: BorderSide(color: Colors.white, width: 0.3),
             ),
             tileColor: const Color.fromARGB(255, 228, 236, 232),
+            trailing: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: SizedBox(
+                width: 0,
+                child: getUnreadCount(receiverMail)),
+            ),
             // show user's username
             title: Row(children: [
-              Text(data['username']),
-              const SizedBox(width: 5), 
+              Text(receiverUsername),
+              const SizedBox(width: 5),
               statusIcon(data)
             ]),
             // show last message sent
-            subtitle: getLastMessage(data['email']),
+            subtitle: getLastMessage(receiverMail),
             // pass the clicked user's email to the chat page
             onTap: () => {
                   Get.to(ChatPage(
-                      receiverUserEmail: data['email'],
-                      receiverUsername: data['username'],
+                      receiverUserEmail: receiverMail,
+                      receiverUsername: receiverUsername,
                       scrollController: scrollController,
                       userImageIcon: userImageIcon))
                 });
@@ -114,6 +142,9 @@ class _MainChatPageState extends State<MainChatPage> {
         return Container();
       }
     } else {
+      return Container();
+    }}
+    catch(e){
       return Container();
     }
   }
@@ -142,20 +173,13 @@ class _MainChatPageState extends State<MainChatPage> {
               prefix = snapshot.data!.docs.last.get('senderUsername') + ':';
             }
 
-            return Row(
-              children: [
-                Text(
-                  '$prefix $message',
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(width: 10),
-                // adding the number of unread messages
-                getUnreadCount(receiverMail)
-              ],
+            return Text(
+              '$prefix $message',
+              overflow: TextOverflow.ellipsis,
             );
           } catch (e) {
             return const Text(
-              'Don\'t be shy, start a conversation 😇',
+              'Don\'t be shy, start a conversation😇',
               style: TextStyle(fontWeight: FontWeight.bold),
             );
           }
@@ -210,30 +234,35 @@ class _MainChatPageState extends State<MainChatPage> {
   }
 
 // build an icon based on the user's status
-  Widget statusIcon(Map<String, dynamic> data){
+  Widget statusIcon(Map<String, dynamic> data) {
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc().snapshots(),
-      builder: (context,snapshot){
-        try{
-        if(snapshot.data != null){
-          Color iconColor = (data['status'] == 'Online') ? Colors.green : Colors.grey;
-          return Icon(Icons.circle,
-          color: iconColor,
-          size: 12,);   
+        stream:
+            FirebaseFirestore.instance.collection('users').doc().snapshots(),
+        builder: (context, snapshot) {
+          try {
+            if (snapshot.data != null) {
+              Color iconColor =
+                  (data['status'] == 'Online') ? Colors.green : Colors.grey;
+              return Icon(
+                Icons.circle,
+                color: iconColor,
+                size: 12,
+              );
+            } else {
+              return const Icon(
+                Icons.circle,
+                color: Colors.grey,
+                size: 12,
+              );
+            }
+          } catch (e) {
+            return const Icon(
+              Icons.circle,
+              color: Colors.grey,
+              size: 12,
+            );
           }
-          else{
-            return const Icon(Icons.circle,
-          color: Colors.grey,
-          size: 12,);
-          }
-        }
-        catch(e){
-          return const Icon(Icons.circle,
-          color: Colors.grey,
-          size: 12,); 
-        }
-      }
-      );
+        });
   }
 
 // this method adds the search functionality
@@ -331,10 +360,5 @@ class _UserImageIconState extends State<UserImageIcon> {
         child: Ink.image(image: image, fit: BoxFit.cover, width: 0, height: 0),
       ),
     );
-  } 
-
-
+  }
 }
-
-
-
