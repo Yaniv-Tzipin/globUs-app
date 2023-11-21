@@ -5,7 +5,6 @@ import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/models/user.dart';
 import 'package:myfirstapp/pages/edit_profile_page.dart';
-import 'package:myfirstapp/services/matches_service.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -56,7 +55,6 @@ class ValidProfilePage extends StatefulWidget {
 class _ValidProfilePageState extends State<ValidProfilePage> {
   @override
   Widget build(BuildContext context) {
-    MatchesService().calcGrade();
     return Scaffold(
       body: ListView(
         physics: const BouncingScrollPhysics(),
