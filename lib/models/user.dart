@@ -8,6 +8,11 @@ class UserProfile{
   late String bio;
   late String profileImagePath;
   late List<dynamic> tags;
+  late List<dynamic> matches;
+  late List<dynamic> swipedRight;
+  late List<dynamic> swipedLeft;
+
+
 
   UserProfile(Map<String, dynamic> userData){
     email = userData['email'];
@@ -17,7 +22,10 @@ class UserProfile{
     originCountry = userData['country'];
     bio = userData['bio'];
     profileImagePath = userData['profile_image'] ?? "";
-    tags = userData['tags'];   
+    tags = userData['tags']; 
+    matches = userData['matches'] ?? [];   
+    swipedRight = userData['swipedRight'] ?? [];   
+    swipedLeft = userData['swipedLeft'] ?? [];     
   }
 
 

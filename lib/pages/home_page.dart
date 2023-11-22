@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/pages/main_chat_page.dart';
+import 'package:myfirstapp/pages/matching_board.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 
@@ -136,7 +137,7 @@ class _NavigationExampleState extends State<NavigationExample> with WidgetsBindi
         Container(
           color: Colors.green,
           alignment: Alignment.center,
-          child: const Text('Page 2'), //TO ADD MATCHES GRID PAGE
+          child: const MatchingBoard(), //TO ADD MATCHES GRID PAGE
         ),
         Container(
           color: Colors.blue,
