@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/pages/chat_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
+import 'package:myfirstapp/services/matches_service.dart';
 
 class MainChatPage extends StatefulWidget {
   const MainChatPage({super.key});
@@ -14,7 +15,7 @@ class MainChatPage extends StatefulWidget {
 
 class _MainChatPageState extends State<MainChatPage> {
   final ChatService _chatService = ChatService();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;   
   // will hold all usernames except for the username of the current user
   List<String> allOtherUsernames = [];
   // will hold the emails except for the email of the current user

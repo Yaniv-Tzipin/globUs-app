@@ -20,6 +20,12 @@ class MatchesService {
   final int ageWeight;
   final int swipeWeight;
 
+  // will hold the emails of the potential matches
+  late List<dynamic> potentialMatchesEmails = [];
+  late List<dynamic> currentUserMatches = [];
+  late List<dynamic> currentUserSwipedRight = [];
+  late List<dynamic> currentUserSwipedLeft = [];
+
   // initiating a constructor with the formula default weights
   // in the future, relate to the option of customed weights
   MatchesService(
@@ -82,10 +88,53 @@ class MatchesService {
   }
 
   double getFinalRank() {
-        return (tagsWeight / 10) * sharedTags +
+    return (tagsWeight / 10) * sharedTags +
         (distancWeight - distance * (distancWeight / 20000)) +
         (ageWeight - ageDiff * (ageWeight / 81)) +
         countryCoeff * originCountryWeight +
         swipingScore;
+  }
+
+  //get potential matches
+  Widget loadPotenitalMatches() {
+    return StreamBuilder(
+        stream: _fireStore.collection('users').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot1) {
+          return StreamBuilder(
+              stream: _fireStore
+                  .collection('users')
+                  .doc(currentUser.email)
+                  .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot2) {
+                if (snapshot1.hasError || snapshot2.hasError) {
+                  return const Text('error');
+                }
+                if (snapshot1.connectionState == ConnectionState.waiting ||
+                    snapshot2.connectionState == ConnectionState.waiting) {
+                  return const Text('loading...');
+                }
+                try {
+                  currentUserMatches = snapshot2.data!.get('matches');
+                  currentUserSwipedRight = snapshot2.data!.get('swipedRight');
+                  currentUserSwipedLeft = snapshot2.data!.get('swipedLeft');
+
+                  for (DocumentSnapshot doc in snapshot1.data!.docs) {
+                    String currentDocEmail = doc.get('email');
+                    if (currentDocEmail != currentUser.email &&
+                        !currentUserMatches.contains(currentDocEmail) &&
+                        !currentUserSwipedRight.contains(currentDocEmail) &&
+                        !currentUserSwipedLeft.contains(currentDocEmail)) {
+                      potentialMatchesEmails.add(currentDocEmail);
+                    }
+                  }
+                  print(potentialMatchesEmails);
+                  // todo: replace it with a stack of cards or something like that
+                  return Text('');
+                } catch (e) {
+                  print(e);
+                  return Text('');
+                }
+              });
+        });
   }
 }
