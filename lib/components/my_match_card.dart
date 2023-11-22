@@ -16,7 +16,7 @@ class MyMatchCard extends StatefulWidget implements Comparable{
   
   @override
   int compareTo(other) {
-    return cardRanking.compareTo(other.cardRanking);
+    return other.cardRanking.compareTo(cardRanking);
   }
 }
 
