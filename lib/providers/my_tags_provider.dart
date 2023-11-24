@@ -24,8 +24,9 @@ class MyTagsProvider extends ChangeNotifier{
   void addTagToChosen(Chip tag){
     _chosenTags.add(tag);
     notifyListeners();
-
   }
+
+  //todo function that adds multiple tags
 
   void addTagToPressed(MyTag tag){
     pressedTags.add(tag);

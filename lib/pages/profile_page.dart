@@ -1,10 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/models/user.dart';
+import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/edit_profile_page.dart';
+import 'package:myfirstapp/providers/my_tags_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -72,14 +76,35 @@ class _ValidProfilePageState extends State<ValidProfilePage> {
                     MaterialPageRoute(builder: (context) => EditProfilePage()),
                   );
                 },
-                ), 
-              buildUserBasicData()],
+              ),
+              buildUserBasicData()
+            ],
           ),
           SizedBox(height: 30),
           buildAbout(currentUser.bio),
-          // TagsWidget(tagsStr: currentUser.tags),
+          SizedBox(height: 30),
+          buildMyTags()
         ],
       ),
+    );
+  }
+
+  Widget buildMyTags() {
+    final tagsCounter = Provider.of<MyTagsProvider>(context);
+    List<MyTag> myTags = currentUser.tags
+        .map((x) => MyTag(tagsCounter: tagsCounter, text: x))
+        .toList();
+
+   return
+    Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text("My Tags",
+            style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+        AbsorbPointer(
+            child: MyTagsGrid(
+                icon: const Icon(Icons.check_rounded), listOfTags: myTags)),
+      ]),
     );
   }
 
@@ -88,10 +113,10 @@ class _ValidProfilePageState extends State<ValidProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("About me",
+            const Text("About me",
                 style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-            SizedBox(height: 7),
-            Text(bio, style: TextStyle(fontSize: 17, height: 1.4)),
+            const SizedBox(height: 7),
+            Text(bio, style: const TextStyle(fontSize: 17, height: 1.4)),
           ],
         ),
       );
