@@ -15,6 +15,7 @@ import "package:myfirstapp/pages/home_page.dart";
 import "package:myfirstapp/pages/login_or_register_page.dart";
 import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:myfirstapp/queries/completed_sign_in_queries.dart' as queries;
+import "package:myfirstapp/services/helpers.dart";
 import 'package:myfirstapp/validations/continue_register_page_validation.dart'as CRPV;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import "package:path/path.dart" as Path;
@@ -115,15 +116,21 @@ class _ContinueRegisterState extends State<ContinueRegister> {
   }
 
 Future<void> uploadImage() async{
-if(_imageFile == null){
-  return;
-}
-final File file = File(_imageFile!.path);
-final String fileName = Path.basename(_imageFile!.path);
+const String defaultProfileImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
+final String chosenPath = _imageFile?.path ?? defaultProfileImage;
+final File file = File(chosenPath);
+final String fileName = Path.basename(chosenPath);
 final String path = '${userMail}/${fileName}';
 
 //try upload the pic to the storage in FireBase
 try{
+  if(chosenPath == defaultProfileImage){
+    _fireStore.collection('users').doc(userMail).set({
+    'profile_image' :  chosenPath}, SetOptions(merge: true)
+  );
+    
+  }
+  else{
   final ref =  firebase_storage.FirebaseStorage.instance.ref().child(path);
   await ref.putFile(file);
 
@@ -133,6 +140,7 @@ try{
   await _fireStore.collection('users').doc(userMail).set({
     'profile_image' :  myURL}, SetOptions(merge: true)
   );
+  }
 
 } catch(e){
   print(e);
@@ -166,7 +174,8 @@ try{
       
       //add user's data to FireStore(except image URL which will happen seperately)
       await UserQueries.addNewUser(userMail, userNameController.text.trim(),
-          birthDateController.text, myBioController.text, countryController.text);
+          parseStringToTimestamp(birthDateController.text),
+          myBioController.text, countryController.text);
       //set user's status to completed register
       await queries.addCompletedUser(userMail);
       //upload user's chosen image to firestore storage
