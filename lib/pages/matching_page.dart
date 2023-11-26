@@ -17,6 +17,7 @@ class _MatchingBoardState extends State<MatchingBoard> {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   final MatchesService _matchService = MatchesService();
   final CardSwiperController swiperController = CardSwiperController();
+  final String currUser = FirebaseAuth.instance.currentUser?.email ?? "";
 
   late List<MyMatchCard> cards;
 
@@ -42,7 +43,7 @@ class _MatchingBoardState extends State<MatchingBoard> {
           return StreamBuilder(
               stream: _fireStore
                   .collection('users')
-                  .doc(currentUser.email)
+                  .doc(currUser)
                   .snapshots(),
               builder:
                   (BuildContext context, AsyncSnapshot<dynamic> snapshot2) {
