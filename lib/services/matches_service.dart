@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/components/my_match_card.dart';
 import 'package:myfirstapp/models/user.dart';
+import 'package:myfirstapp/services/chat/chat_services.dart';
 
 class MatchesService {
-//get instance of auth and firestore
+//get instance of auth, chat service and firestore
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+  final ChatService _chatService = ChatService();
   late int sharedTags;
   late double swipingScore;
   late int ageDiff;
@@ -22,11 +24,11 @@ class MatchesService {
   final int swipeWeight;
 
 // will hold the emails of the potential matches
-  late List<dynamic> potentialMatchesEmails = [];
-  late List<dynamic> currentUserMatches = [];
-  late List<dynamic> currentUserSwipedRight = [];
-  late List<dynamic> currentUserSwipedLeft = [];
-  late List<MyMatchCard> cards = [];
+  late List<dynamic> potentialMatchesEmails;
+  late List<dynamic> currentUserMatches;
+  late List<dynamic> currentUserSwipedRight;
+  late List<dynamic> currentUserSwipedLeft;
+  late List<MyMatchCard> cards;
 
 // initiating a constructor with the formula default weights
 // in the future, relate to the option of customed weights
@@ -103,11 +105,20 @@ class MatchesService {
 //get potential matches
   void loadPotenitalMatches(
       AsyncSnapshot<dynamic> snapshot1, AsyncSnapshot<dynamic> snapshot2) {
+    
     try {
+      cards = [];
+      potentialMatchesEmails = [];
+      currentUserMatches = [];
+      currentUserSwipedRight = [];
+      currentUserSwipedLeft = [];
 // retrieving the relevant data regarding current user
       currentUserMatches = snapshot2.data!.get('matches');
+      print(currentUserMatches.toString());
       currentUserSwipedRight = snapshot2.data!.get('swipedRight');
+      print(currentUserSwipedRight.toString());
       currentUserSwipedLeft = snapshot2.data!.get('swipedLeft');
+      print(currentUserSwipedLeft.toString());
 // looping through all existing users and adding just
 // the potential matches to the list
       for (DocumentSnapshot doc in snapshot1.data!.docs) {
@@ -127,5 +138,66 @@ class MatchesService {
 
   List<MyMatchCard> getCards() {
     return cards;
+  }
+
+  Future<bool> checkIfAMatch(
+      String currentUserEmail, String cardsOwnerEmail) async {
+    // check if both users swiped right and if so - open a chat room
+
+    try {
+      var cardsOwnerRightSwipes = await _fireStore
+          .collection('users')
+          .doc(cardsOwnerEmail)
+          .get()
+          .then((snapshot) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        return data['swipedRight'];
+      });
+      if (cardsOwnerRightSwipes.contains(currentUserEmail)) {
+        String secondUsername = await _fireStore
+            .collection('users')
+            .doc(cardsOwnerEmail)
+            .get()
+            .then((snapshot) {
+          Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+          return data['username'];
+        });
+        //create a chat room
+        String chatRoomId =
+            _chatService.getChatRoomId(currentUserEmail, cardsOwnerEmail);
+        await _chatService.createANewChatRoom(chatRoomId, cardsOwnerEmail,
+            secondUsername, currentUserEmail, currentUser.username);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> addMatch(String currentEmail, String cardsOwnerEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'matches': FieldValue.arrayUnion([cardsOwnerEmail])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> deleteSwipedRight(
+      String currentEmail, String cardsOwnerEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'swipedRight': FieldValue.arrayRemove([cardsOwnerEmail])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addSwipedRight(String currentEmail, String otherEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'swipedRight': FieldValue.arrayUnion([otherEmail])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addSwipedLeft(String currentEmail, String otherEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'swipedLeft': FieldValue.arrayUnion([otherEmail])
+    }, SetOptions(merge: true));
   }
 }

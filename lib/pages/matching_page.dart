@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:myfirstapp/components/my_match_card.dart';
@@ -16,7 +17,8 @@ class _MatchingBoardState extends State<MatchingBoard> {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   final MatchesService _matchService = MatchesService();
   final CardSwiperController swiperController = CardSwiperController();
-  late List<MyMatchCard> cards = [];
+
+  late List<MyMatchCard> cards;
 
   @override
   void dispose() {
@@ -30,6 +32,12 @@ class _MatchingBoardState extends State<MatchingBoard> {
 // will listen to all users collection
         stream: _fireStore.collection('users').snapshots(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot1) {
+          if(snapshot1.hasError){
+            return const Text('error');
+          }
+          if(snapshot1.connectionState == ConnectionState.waiting){
+            return const Text('loading...');
+          }
 // will listen just to the current user
           return StreamBuilder(
               stream: _fireStore
@@ -38,70 +46,71 @@ class _MatchingBoardState extends State<MatchingBoard> {
                   .snapshots(),
               builder:
                   (BuildContext context, AsyncSnapshot<dynamic> snapshot2) {
-                if (snapshot1.hasError || snapshot2.hasError) {
+                if (snapshot2.hasError) {
                   return const Text('error');
                 }
-                if (snapshot1.connectionState == ConnectionState.waiting ||
-                    snapshot2.connectionState == ConnectionState.waiting) {
+                if (snapshot2.connectionState == ConnectionState.waiting) {
                   return const Text('loading...');
                 }
-// initializing cards to an empty list
-                cards = [];
+                print('i');
 // updating cards list to containg potential matches
                 _matchService.loadPotenitalMatches(snapshot1, snapshot2);
                 cards = _matchService.getCards();
 // sorting the cards by ranking
                 cards.sort();
+                print(cards.length);
 
-// for (MyMatchCard card in cards) {
-// print(card.userEmail);
-// print(card.cardRanking);
-// }
-                return Scaffold(
-                    body: SafeArea(
-                  child: Column(children: [
-                    Flexible(
-                        child: CardSwiper(
-                      isLoop: false,
-                      controller: swiperController,
-                      onSwipe: _onSwipe,
-                      backCardOffset: const Offset(0, 0),
-                      allowedSwipeDirection: AllowedSwipeDirection.only(
-                          down: false, up: false, right: true, left: true),
-                      cardBuilder: (context,
-                              index,
-                              horizontalThresholdPercentage,
-                              verticalThresholdPercentage) =>
-                          cards[index],
-                      cardsCount: cards.length,
-                      numberOfCardsDisplayed: cards.length,
-                    )),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: swipeCardLeft,
-                            icon: const Icon(Icons.cancel),
-                            iconSize: 60,
-                            color: const Color.fromARGB(255, 209, 201, 194),
-                          ),
-                          const SizedBox(
-                            width: 70,
-                          ),
-                          IconButton(
-                            onPressed: swipeCardRight,
-                            icon: const Icon(Icons.favorite_rounded),
-                            iconSize: 60,
-                            color: const Color.fromARGB(255, 240, 119, 105),
-                          )
-                        ],
+                if (cards.isEmpty) {
+                  return Container();
+                } else {
+                  return Scaffold(
+                      body: SafeArea(
+                    child: Column(children: [
+                      Flexible(
+                          child: CardSwiper(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.all(24.0),
+                        isLoop: false,
+                        controller: swiperController,
+                        onSwipe: _onSwipe,
+                        backCardOffset: const Offset(0, 0),
+                        allowedSwipeDirection: AllowedSwipeDirection.only(
+                            down: false, up: false, right: true, left: true),
+                        cardBuilder: (context,
+                                index,
+                                horizontalThresholdPercentage,
+                                verticalThresholdPercentage) =>
+                            cards[index],
+                        cardsCount: cards.length,
+                        numberOfCardsDisplayed: cards.length,
+                      )),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: swipeCardLeftWithBotton,
+                              icon: const Icon(Icons.cancel),
+                              iconSize: 60,
+                              color: const Color.fromARGB(255, 209, 201, 194),
+                            ),
+                            const SizedBox(
+                              width: 70,
+                            ),
+                            IconButton(
+                              onPressed: swipeCardRightWithBotton,
+                              icon: const Icon(Icons.favorite_rounded),
+                              iconSize: 60,
+                              color: const Color.fromARGB(255, 240, 119, 105),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  ]),
-                ));
+                    ]),
+                  ));
+                }
               });
         });
   }
@@ -111,22 +120,47 @@ class _MatchingBoardState extends State<MatchingBoard> {
     int? currentIndex,
     CardSwiperDirection direction,
   ) {
-    (direction == CardSwiperDirection.left)
-        ? swipeCardLeft()
-        : swipeCardRight();
     debugPrint(
       'The card $previousIndex was swiped to the ${direction.name}. Now the card $currentIndex is on top',
     );
+print(previousIndex);
+    String cardsOwnerEmail = cards[previousIndex].userEmail;
+    (direction == CardSwiperDirection.right)
+        ? swipeCardRightWithoutBotton(cardsOwnerEmail)
+        : swipeCardLeftWithoutBotton(cardsOwnerEmail);
+
     return true;
   }
 
-//it should be Future<void>
-  Future<void> swipeCardLeft() async {
+// will trigger _onSwipe method
+  void swipeCardLeftWithBotton() async {
     swiperController.swipeLeft();
   }
 
-//it should be Future<void>
-  Future<void> swipeCardRight() async {
+// will trigger _onSwipe method
+  void swipeCardRightWithBotton() async {
     swiperController.swipeRight();
+  }
+
+  Future<void> swipeCardLeftWithoutBotton(String cardsOwnerEmail) async {
+    _matchService.addSwipedLeft(currentUser.email, cardsOwnerEmail);
+  }
+
+  Future<void> swipeCardRightWithoutBotton(String cardsOwnerEmail) async {
+//if it's a match the chat service creates a chat room
+    bool isAMatch =
+        await _matchService.checkIfAMatch(currentUser.email, cardsOwnerEmail);
+    if (isAMatch) {
+      //upsate the matches list in DB
+      await _matchService.addMatch(currentUser.email, cardsOwnerEmail);
+      await _matchService.addMatch(cardsOwnerEmail, currentUser.email);
+      await _matchService.deleteSwipedRight(cardsOwnerEmail, currentUser.email);
+      //!!TO DO: pop a page.
+
+      //dothings - to create a pop up page
+    } else {
+      //add to current user's swiped right list in DB
+      await _matchService.addSwipedRight(currentUser.email, cardsOwnerEmail);
+    }
   }
 }

@@ -46,20 +46,18 @@ class ChatService extends ChangeNotifier {
         .doc(uniqueChatRoomID)
         .collection('messages')
         .add(newMessage.toMap());
-    
- 
+
     var res =
         await _fireStore.collection('chat_rooms').doc(uniqueChatRoomID).get();
     // checking if the doc fields regarding unread messages don't exist
-    // if so we add them 
+    // if so we add them
 
-
-  
-    if (res.data() == null) { 
+    if (res.data() == null) {
       await FirebaseFirestore.instance
           .collection('chat_rooms')
           .doc(uniqueChatRoomID)
-          .set({'${currentUserEmail}_unread': 0, '${receiverEmail}_unread': 0}, SetOptions(merge: true));
+          .set({'${currentUserEmail}_unread': 0, '${receiverEmail}_unread': 0},
+              SetOptions(merge: true));
     }
 
     //update some fields field
@@ -69,13 +67,8 @@ class ChatService extends ChangeNotifier {
       'firstUsername': currentUsername,
       'secondEmail': receiverEmail,
       'secondUsername': receiverUsername
-
     }, SetOptions(merge: true));
-    
 
-  
-
-    
     // updating unread messages info
     await updateUnreadMessagesCount(currentUserEmail, receiverEmail, 1);
   }
@@ -94,20 +87,24 @@ class ChatService extends ChangeNotifier {
 
   // Get ChatRooms
   Stream<QuerySnapshot> getChatRooms() {
-    return _fireStore.collection('chat_rooms').snapshots(includeMetadataChanges: true);
+    return _fireStore
+        .collection('chat_rooms')
+        .snapshots(includeMetadataChanges: true);
   }
 
   // Get all ChatRomms ordered by timestamo
   Stream<QuerySnapshot> getChatRoomsByTimestamp() {
     String currentUserEmail = _firebaseAuth.currentUser?.email ?? "";
-    return _fireStore.collection('chat_rooms').orderBy('lastMessageTimeStamp', descending: true).snapshots();
+    return _fireStore
+        .collection('chat_rooms')
+        .orderBy('lastMessageTimeStamp', descending: true)
+        .snapshots();
   }
 
-
-  // a method that updates the number of unread messages into firebase 
-  // if the user sent a message, add param will be equal to one. 
+  // a method that updates the number of unread messages into firebase
+  // if the user sent a message, add param will be equal to one.
   // Otherwise it will be zero.
-  Future <void> updateUnreadMessagesCount(
+  Future<void> updateUnreadMessagesCount(
       String currentUserEmail, String receiverEmail, int add) async {
     try {
       String uniqueChatRoomID = getChatRoomId(currentUserEmail, receiverEmail);
@@ -136,8 +133,7 @@ class ChatService extends ChangeNotifier {
   }
 
   // construct chat room id from current user id and receiver id (sorted to ensure uniqueness)
-  String getChatRoomId(String currentUserEmail, String receiverEmail)
-  {
+  String getChatRoomId(String currentUserEmail, String receiverEmail) {
     //construct chat room id from current user id and receiver id (sorted to ensure uniqueness)
     List<String> emails = [currentUserEmail, receiverEmail];
     // sorting the mails ensures uniqueness
@@ -146,7 +142,7 @@ class ChatService extends ChangeNotifier {
     return emails.join("_");
   }
 
-    //this method shows how many unread messages the user have
+  //this method shows how many unread messages the user have
   Widget totalUnreadMessagesCount() {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
     return StreamBuilder(
@@ -188,5 +184,16 @@ class ChatService extends ChangeNotifier {
           }
         });
   }
-}
 
+  Future<void> createANewChatRoom(String uniqueChatRoomID, String firstEmail, String firstUsername, String secondEmail, String secondUsername) async {
+    Map<String, dynamic> data = {
+      'firstEmail': firstEmail,
+      'firstUsername': firstUsername,
+      'secondEmail': secondEmail,
+      'secondUsername': secondUsername,
+      'lastMessageTimeStamp': Timestamp.now()
+
+    };
+    await _fireStore.collection('chat_rooms').doc(uniqueChatRoomID).set(data);
+  }
+}
