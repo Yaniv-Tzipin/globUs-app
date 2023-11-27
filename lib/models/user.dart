@@ -11,6 +11,8 @@ class UserProfile{
   late List<dynamic> matches;
   late List<dynamic> swipedRight;
   late List<dynamic> swipedLeft;
+  late String latitude;
+  late String longitude;
 
 
 
@@ -25,7 +27,9 @@ class UserProfile{
     tags = userData['tags']; 
     matches = userData['matches'] ?? [];   
     swipedRight = userData['swipedRight'] ?? [];   
-    swipedLeft = userData['swipedLeft'] ?? [];     
+    swipedLeft = userData['swipedLeft'] ?? [];   
+    latitude = userData['latitude'] ?? ""; 
+    longitude = userData['longitude'] ?? "";  
   }
 
 

@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/components/my_match_card.dart';
 import 'package:myfirstapp/models/user.dart';
+import 'package:myfirstapp/services/chat/chat_services.dart';
 
 class MatchesService {
-  //get instance of auth and firestore
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+//get instance of auth, chat service and firestore
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+  final ChatService _chatService = ChatService();
   late int sharedTags;
   late double swipingScore;
   late int ageDiff;
@@ -21,15 +22,15 @@ class MatchesService {
   final int ageWeight;
   final int swipeWeight;
 
-  // will hold the emails of the potential matches
-  late List<dynamic> potentialMatchesEmails = [];
-  late List<dynamic> currentUserMatches = [];
-  late List<dynamic> currentUserSwipedRight = [];
-  late List<dynamic> currentUserSwipedLeft = [];
-  late List<MyMatchCard> cards = [];
+// will hold the emails of the potential matches
+  late List<dynamic> potentialMatchesEmails;
+  late List<dynamic> currentUserMatches;
+  late List<dynamic> currentUserSwipedRight;
+  late List<dynamic> currentUserSwipedLeft;
+  late List<MyMatchCard> cards;
 
-  // initiating a constructor with the formula default weights
-  // in the future, relate to the option of customed weights
+// initiating a constructor with the formula default weights
+// in the future, relate to the option of customed weights
   MatchesService(
       {this.distancWeight = 50,
       this.tagsWeight = 30,
@@ -41,7 +42,6 @@ class MatchesService {
     // will hold the potential match fields
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     UserProfile potentialMatch = UserProfile(data);
-
     potentialMatch.originCountry == currentUser.originCountry
         ? countryCoeff = 1
         : countryCoeff = 0;
@@ -49,10 +49,12 @@ class MatchesService {
         potentialMatch.swipedLeft, potentialMatch.swipedRight);
     sharedTags = sharedTagsAmount(potentialMatch.tags);
     ageDiff = getAgeDiff(potentialMatch.age);
-    // todo: change it to a distance method when we choose a suitable package
-    distance = 0;
+// todo: change it to a distance method when we choose a suitable package
+    distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
     rank = getFinalRank();
-    // updating the potential matches cards list
+    print(potentialMatch.email);
+    print(distance);
+// updating the potential matches cards list
     cards.add(MyMatchCard(cardRanking: rank, userEmail: potentialMatch.email));
   }
 
@@ -74,21 +76,43 @@ class MatchesService {
     return (potentialMatchAge - currentUser.age).abs();
   }
 
+  double calcDistance(String potentialMatchLat, String potentialMatchLong) {
+    double distanceInMeters;
+    if (potentialMatchLat == "" ||
+        potentialMatchLong == "" ||
+        currentUser.latitude == "" ||
+        currentUser.longitude == "") {
+      return 0;
+    } else {
+      try {
+        distanceInMeters = GeolocatorPlatform.instance.distanceBetween(
+            double.parse(potentialMatchLat),
+            double.parse(potentialMatchLong),
+            double.parse(currentUser.latitude),
+            double.parse(currentUser.longitude));
+      } catch (e) {
+        print(e);
+        return 0;
+      }
+      return distanceInMeters / 1000;
+    }
+  }
+
 // A method that checks if the current user and the current potential match
 // have already swiped each other and gives a suitable score
   double scoreBasedOnSwiping(List<dynamic> potentialMatchSwipedLeft,
       List<dynamic> potentialMatchSwipedRight) {
-    // the potential match swiped the current user left
+// the potential match swiped the current user left
 
-    // todo: check if the matches list will contain emails/usernames/something else...
+// todo: check if the matches list will contain emails/usernames/something else...
     if (potentialMatchSwipedLeft.contains(currentUser.email)) {
       return 0;
     }
-    // the potential match swiped the current user right
+// the potential match swiped the current user right
     if (potentialMatchSwipedRight.contains(currentUser.email)) {
       return swipeWeight.toDouble();
     }
-    // the potential match has not swiped the current user yet
+// the potential match has not swiped the current user yet
     return (swipeWeight / 2).toDouble();
   }
 
@@ -100,10 +124,16 @@ class MatchesService {
         swipingScore;
   }
 
-  //get potential matches
+//get potential matches
   void loadPotenitalMatches(
       AsyncSnapshot<dynamic> snapshot1, AsyncSnapshot<dynamic> snapshot2) {
     try {
+      // initiating the variables with empty lists
+      cards = [];
+      potentialMatchesEmails = [];
+      currentUserMatches = [];
+      currentUserSwipedRight = [];
+      currentUserSwipedLeft = [];
       // retrieving the relevant data regarding current user
       currentUserMatches = snapshot2.data!.get('matches');
       currentUserSwipedRight = snapshot2.data!.get('swipedRight');
@@ -125,8 +155,68 @@ class MatchesService {
     }
   }
 
-  List <MyMatchCard> getCards()
-  {
+  List<MyMatchCard> getCards() {
     return cards;
+  }
+
+  Future<bool> checkIfAMatch(
+      String currentUserEmail, String cardsOwnerEmail) async {
+    // check if both users swiped right and if so - open a chat room
+
+    try {
+      var cardsOwnerRightSwipes = await _fireStore
+          .collection('users')
+          .doc(cardsOwnerEmail)
+          .get()
+          .then((snapshot) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        return data['swipedRight'];
+      });
+      if (cardsOwnerRightSwipes.contains(currentUserEmail)) {
+        String secondUsername = await _fireStore
+            .collection('users')
+            .doc(cardsOwnerEmail)
+            .get()
+            .then((snapshot) {
+          Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+          return data['username'];
+        });
+        //create a chat room
+        String chatRoomId =
+            _chatService.getChatRoomId(currentUserEmail, cardsOwnerEmail);
+        await _chatService.createANewChatRoom(chatRoomId, cardsOwnerEmail,
+            secondUsername, currentUserEmail, currentUser.username);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> addMatch(String currentEmail, String cardsOwnerEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'matches': FieldValue.arrayUnion([cardsOwnerEmail])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> deleteSwipedRight(
+      String currentEmail, String cardsOwnerEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'swipedRight': FieldValue.arrayRemove([cardsOwnerEmail])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addSwipedRight(String currentEmail, String otherEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'swipedRight': FieldValue.arrayUnion([otherEmail])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addSwipedLeft(String currentEmail, String otherEmail) async {
+    await FirebaseFirestore.instance.collection('users').doc(currentEmail).set({
+      'swipedLeft': FieldValue.arrayUnion([otherEmail])
+    }, SetOptions(merge: true));
   }
 }

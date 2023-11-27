@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/pages/chat_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
-import 'package:myfirstapp/services/matches_service.dart';
 
 class MainChatPage extends StatefulWidget {
   const MainChatPage({super.key});

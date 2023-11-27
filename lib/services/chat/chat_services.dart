@@ -7,7 +7,7 @@ class ChatService extends ChangeNotifier {
   //get instance of auth and firestore
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
-  
+
   // Send Message
   Future<void> sendMessage(String receiverEmail, String message) async {
     // get current user info
@@ -194,5 +194,17 @@ class ChatService extends ChangeNotifier {
       return e.toString();
     }
     return currentUsername;
+  }
+
+  Future<void> createANewChatRoom(String uniqueChatRoomID, String firstEmail,
+      String firstUsername, String secondEmail, String secondUsername) async {
+    Map<String, dynamic> data = {
+      'firstEmail': firstEmail,
+      'firstUsername': firstUsername,
+      'secondEmail': secondEmail,
+      'secondUsername': secondUsername,
+      'lastMessageTimeStamp': Timestamp.now()
+    };
+    await _fireStore.collection('chat_rooms').doc(uniqueChatRoomID).set(data);
   }
 }
