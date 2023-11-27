@@ -96,7 +96,7 @@ class _MainChatPageState extends State<MainChatPage> {
     String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
     String receiverMail = (data['firstEmail'] == currentUserMail) ? data['secondEmail'] : data['firstEmail'];
     String receiverUsername = (data['firstEmail'] == currentUserMail) ? data['secondUsername'] : data['firstUsername'];
-    UserImageIcon userImageIcon = UserImageIcon(userMail: receiverMail);
+    UserImageIcon userImageIcon = UserImageIcon(userMail: receiverMail, size: 60,);
 
     // display all users except current one
     if (FirebaseAuth.instance.currentUser?.email != receiverMail 
@@ -303,8 +303,9 @@ class _MainChatPageState extends State<MainChatPage> {
 
 //this section is responsible for showing the profile images of the users
 class UserImageIcon extends StatefulWidget {
+  final double size;
   final String userMail;
-  const UserImageIcon({super.key, required this.userMail});
+  const UserImageIcon({super.key, required this.userMail, required this.size});
 
   @override
   State<UserImageIcon> createState() => _UserImageIconState();
@@ -339,15 +340,15 @@ class _UserImageIconState extends State<UserImageIcon> {
         future: loadImage(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-              width: 60,
-              height: 60,
-              child: Center(
+            return  SizedBox(
+              width: widget.size,
+              height: widget.size,
+              child: const Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
-          return SizedBox(width: 60, height: 60, child: buildImage());
+          return SizedBox(width: widget.size, height: widget.size, child: buildImage());
         });
   }
 

@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_match_card.dart';
+import 'package:myfirstapp/pages/its_a_match_page.dart';
 import 'package:myfirstapp/services/matches_service.dart';
 import 'package:myfirstapp/globals.dart';
 
@@ -53,13 +55,11 @@ class _MatchingBoardState extends State<MatchingBoard> {
                 if (snapshot2.connectionState == ConnectionState.waiting) {
                   return const Text('loading...');
                 }
-                print('i');
 // updating cards list to containg potential matches
                 _matchService.loadPotenitalMatches(snapshot1, snapshot2);
                 cards = _matchService.getCards();
 // sorting the cards by ranking
                 cards.sort();
-                print(cards.length);
 
                 if (cards.isEmpty) {
                   return Container();
@@ -124,7 +124,6 @@ class _MatchingBoardState extends State<MatchingBoard> {
     debugPrint(
       'The card $previousIndex was swiped to the ${direction.name}. Now the card $currentIndex is on top',
     );
-print(previousIndex);
     String cardsOwnerEmail = cards[previousIndex].userEmail;
     (direction == CardSwiperDirection.right)
         ? swipeCardRightWithoutBotton(cardsOwnerEmail)
@@ -156,7 +155,7 @@ print(previousIndex);
       await _matchService.addMatch(currentUser.email, cardsOwnerEmail);
       await _matchService.addMatch(cardsOwnerEmail, currentUser.email);
       await _matchService.deleteSwipedRight(cardsOwnerEmail, currentUser.email);
-      //!!TO DO: pop a page.
+      Get.to(ItsAMatchPage(currentUserEmail: currentUser.email, cardsOwnerEmail: cardsOwnerEmail,));
 
       //dothings - to create a pop up page
     } else {

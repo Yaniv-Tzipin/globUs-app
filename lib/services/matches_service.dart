@@ -114,11 +114,11 @@ class MatchesService {
       currentUserSwipedLeft = [];
 // retrieving the relevant data regarding current user
       currentUserMatches = snapshot2.data!.get('matches');
-      print(currentUserMatches.toString());
+      // print(currentUserMatches.toString());
       currentUserSwipedRight = snapshot2.data!.get('swipedRight');
-      print(currentUserSwipedRight.toString());
+      // print(currentUserSwipedRight.toString());
       currentUserSwipedLeft = snapshot2.data!.get('swipedLeft');
-      print(currentUserSwipedLeft.toString());
+      // print(currentUserSwipedLeft.toString());
 // looping through all existing users and adding just
 // the potential matches to the list
       for (DocumentSnapshot doc in snapshot1.data!.docs) {
