@@ -41,7 +41,11 @@ await FirebaseFirestore.instance.collection('users').doc(email).set({
 'birth_date': birthdate,
 'bio': bio,
 'tags': usersTagsToString,
-'country': country
+'country': country,
+'matches': [],
+'swipedRight': [],
+'swipedLeft': [],
+'status': 'Online'
 });
 }
 

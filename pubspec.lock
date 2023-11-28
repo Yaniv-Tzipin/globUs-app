@@ -238,6 +238,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_card_swiper:
+    dependency: "direct main"
+    description:
+      name: flutter_card_swiper
+      sha256: bd4a63d512ce3992b1950f6c46efeff4a0890e117e36c0fa7101b578bd0fdf3a
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -480,6 +488,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  shadow_overlay:
+    dependency: "direct main"
+    description:
+      name: shadow_overlay
+      sha256: "516a117fab493fb34d8a34a2b29436ea89619c1b8a1f737a71f1f4f4841c8dd3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
   sky_engine:
     dependency: transitive
     description: flutter
