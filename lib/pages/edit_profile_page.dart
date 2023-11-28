@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
@@ -9,11 +7,13 @@ import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
+import 'package:myfirstapp/pages/home_page.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
 import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+  List<String> stringTags = [];
+  EditProfilePage({super.key,});
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -34,7 +34,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             .update({entry.key: controller.text});
       }
     }
+
     //todo: once Save is pressed, reload profile page automatically
+  }
+
+  void updateTagsInDB(List<String> tagsString){
+    FirebaseFirestore.instance.collection('users').doc(currentUser.email).update({'tags': tagsString});
+  }
+
+  void appBarOnPressed(){
+    updateTagsInDB(widget.stringTags);
+    Get.to( HomePage());
   }
 
   @override
@@ -43,7 +53,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
-        leading: BackButton(color: Colors.grey[800]),
+        leading: BackButton(color: Colors.grey[800], onPressed: appBarOnPressed),
         toolbarHeight: 40,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -94,10 +104,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void goToChooseTags() async {
-    final tagsCounter = Provider.of<MyTagsProvider>(context, listen: false);
-    MyTag tag = MyTag(tagsCounter: tagsCounter, text: 'chosent-tag');
-    tagsCounter.addTagToChosen(Chip(label: Text('chosen-tag')));
-    Get.to(MyTags());
+    var tagsCounter = Provider.of<MyTagsProvider>(context, listen: false);
+    for (String tag in currentUser.tags) {
+      tagsCounter.addTagToChosen(Chip(label: Text(tag),));
+    }
+    await Get.to(MyTags());
+    for (Chip tagChip in tagsCounter.chosenTags) {
+      Text txt = tagChip.label as Text;
+      widget.stringTags.add(txt.data.toString());
+    }
+    // updateTagsInDB(stringTags);
   }
 
 }

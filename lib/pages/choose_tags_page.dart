@@ -5,7 +5,9 @@ import "package:provider/provider.dart";
 import 'package:myfirstapp/components/my_colors.dart' as my_colors;
 
 class MyTags extends StatefulWidget {
-  const MyTags({super.key});
+  final bool? isEditProfilePage = false;
+
+  const MyTags({super.key, isEditProfilePage = false});
 
   @override
   State<MyTags> createState() => _MyTagsState();
@@ -113,6 +115,7 @@ class _MyTagsState extends State<MyTags> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
+        // leading: BackButton(color: Colors.grey[800], onPressed: () => Get.to(EditProfilePage())),
         elevation: 0,
         toolbarHeight: 40,
         title: Text('My Tags $tagsCount/10'),
@@ -174,7 +177,7 @@ class _MyTagsState extends State<MyTags> {
 class MyTag extends StatefulWidget {
   final String text;
   const MyTag({
-    super.key,
+        super.key,
     required this.tagsCounter,
     required this.text,
   });
