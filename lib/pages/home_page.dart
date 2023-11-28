@@ -64,7 +64,7 @@ class _NavigationExampleState extends State<NavigationExample> with WidgetsBindi
     return Scaffold(
       appBar: AppBar(
         title: Text(pageTitle, style: TextStyle(fontSize: 20,
-        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 139, 189, 139)),),
+        fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 203, 228, 204)),),
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
         toolbarHeight: 40,
@@ -131,11 +131,12 @@ class _NavigationExampleState extends State<NavigationExample> with WidgetsBindi
       ),
       body: <Widget>[
         Container(
+          color: const Color.fromARGB(255, 203, 228, 204),
           alignment: Alignment.center,
           child: ProfilePage(),
         ),
         Container(
-          color: Colors.green,
+          color: const Color.fromARGB(255, 203, 228, 204),
           alignment: Alignment.center,
           child: MatchingBoard(), //TO ADD MATCHES GRID PAGE
         ),

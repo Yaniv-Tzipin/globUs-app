@@ -62,7 +62,11 @@ class _MatchingBoardState extends State<MatchingBoard> {
                 cards.sort();
 
                 if (cards.isEmpty) {
-                  return Container();
+                  return  const Text('Come back soon to find some new matches 👻',
+                  style: TextStyle(fontWeight: FontWeight.bold,
+                  color: Colors.white, fontSize: 18),
+                  textAlign: TextAlign.center,);
+                  
                 } else {
                   return Scaffold(
                       body: SafeArea(

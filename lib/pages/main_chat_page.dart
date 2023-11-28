@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/pages/chat_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 
@@ -23,7 +24,7 @@ class _MainChatPageState extends State<MainChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: const Color.fromARGB(255, 228, 236, 232),
+            backgroundColor: veryBeautifulLightGreen,
             toolbarHeight: 75,
             title: Column(
               children: [
@@ -58,7 +59,9 @@ class _MainChatPageState extends State<MainChatPage> {
 // so that befor every new query this list will be cleaned
     allOtherUsernames = [];
     return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').snapshots(), //this stream will be changes soon
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .snapshots(), //this stream will be changes soon
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('error');
@@ -67,84 +70,93 @@ class _MainChatPageState extends State<MainChatPage> {
             return const Text('loading');
           }
           return StreamBuilder(
-            stream: _chatService.getChatRoomsByTimestamp(),
-            builder: (context,snapshot1)
-            {
-              if (snapshot1.hasError) {
-            return const Text('error');
-          }
-          if (snapshot1.connectionState == ConnectionState.waiting) {
-            return const Text('loading');
-          }
-           List<Widget> listOfChats = snapshot1.data!.docs
-              .map<Widget>((doc) => buildUserListItem(doc, true))
-              .toList();
-          
-          return ListView(children: listOfChats);
-            });
-
-
-         
+              stream: _chatService.getChatRoomsByTimestamp(),
+              builder: (context, snapshot1) {
+                if (snapshot1.hasError) {
+                  return const Text('error');
+                }
+                if (snapshot1.connectionState == ConnectionState.waiting) {
+                  return const Text('loading');
+                }
+                List<Widget> listOfChats = snapshot1.data!.docs
+                    .map<Widget>((doc) => buildUserListItem(doc, true))
+                    .toList();
+                listOfChats.add(const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Swipe users to get some new chats with potential matches',
+                    textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),),
+                ));
+                return ListView(children: listOfChats);
+              });
         });
   }
 
   // build individual user list items
   Widget buildUserListItem(DocumentSnapshot document, bool isExistingChatRoom) {
-  try{
-    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    ScrollController scrollController = ScrollController();
-    String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
-    String receiverMail = (data['firstEmail'] == currentUserMail) ? data['secondEmail'] : data['firstEmail'];
-    String receiverUsername = (data['firstEmail'] == currentUserMail) ? data['secondUsername'] : data['firstUsername'];
-    UserImageIcon userImageIcon = UserImageIcon(userMail: receiverMail, size: 60,);
+    try {
+      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+      ScrollController scrollController = ScrollController();
+      String currentUserMail = _firebaseAuth.currentUser?.email ?? "";
+      String receiverMail = (data['firstEmail'] == currentUserMail)
+          ? data['secondEmail']
+          : data['firstEmail'];
+      String receiverUsername = (data['firstEmail'] == currentUserMail)
+          ? data['secondUsername']
+          : data['firstUsername'];
+      UserImageIcon userImageIcon = UserImageIcon(
+        userMail: receiverMail,
+        size: 60,
+      );
 
-    // display all users except current one
-    if (FirebaseAuth.instance.currentUser?.email != receiverMail 
-    // making sure to get only the chat rooms that the current user is part of
-    && (data['firstEmail'] == currentUserMail || data['secondEmail'] == currentUserMail)) {
-      allOtherUsernames.add(receiverUsername);
-      // when filteredItems is empty, no query was called yet, so display
-      // all other usernames. If filteredItems is not empty, there are results
-      // for the search query so show just these results
-      if (filteredItems.isEmpty || filteredItems.contains(receiverUsername)) {
-        return ListTile(
-            //receiver's profile image
-            leading: userImageIcon,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            shape: const RoundedRectangleBorder(
-              side: BorderSide(color: Colors.white, width: 0.3),
-            ),
-            tileColor: const Color.fromARGB(255, 228, 236, 232),
-            trailing: Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: SizedBox(
-                width: 0,
-                child: getUnreadCount(receiverMail)),
-            ),
-            // show user's username
-            title: Row(children: [
-              Text(receiverUsername),
-              const SizedBox(width: 5),
-              statusIcon(data)
-            ]),
-            // show last message sent
-            subtitle: getLastMessage(receiverMail),
-            // pass the clicked user's email to the chat page
-            onTap: () => {
-                  Get.to(ChatPage(
-                      receiverUserEmail: receiverMail,
-                      receiverUsername: receiverUsername,
-                      scrollController: scrollController,
-                      userImageIcon: userImageIcon))
-                });
+      // display all users except current one
+      if (FirebaseAuth.instance.currentUser?.email != receiverMail
+          // making sure to get only the chat rooms that the current user is part of
+          &&
+          (data['firstEmail'] == currentUserMail ||
+              data['secondEmail'] == currentUserMail)) {
+        allOtherUsernames.add(receiverUsername);
+        // when filteredItems is empty, no query was called yet, so display
+        // all other usernames. If filteredItems is not empty, there are results
+        // for the search query so show just these results
+        if (filteredItems.isEmpty || filteredItems.contains(receiverUsername)) {
+          return ListTile(
+              //receiver's profile image
+              leading: userImageIcon,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: Colors.white, width: 0.3),
+              ),
+              tileColor: veryBeautifulLightGreen,
+              trailing: Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: SizedBox(width: 0, child: getUnreadCount(receiverMail)),
+              ),
+              // show user's username
+              title: Row(children: [
+                Text(receiverUsername),
+                const SizedBox(width: 5),
+                statusIcon(data)
+              ]),
+              // show last message sent
+              subtitle: getLastMessage(receiverMail),
+              // pass the clicked user's email to the chat page
+              onTap: () => {
+                    Get.to(ChatPage(
+                        receiverUserEmail: receiverMail,
+                        receiverUsername: receiverUsername,
+                        scrollController: scrollController,
+                        userImageIcon: userImageIcon))
+                  });
+        } else {
+          return Container();
+        }
       } else {
         return Container();
       }
-    } else {
-      return Container();
-    }}
-    catch(e){
+    } catch (e) {
       return Container();
     }
   }
@@ -340,7 +352,7 @@ class _UserImageIconState extends State<UserImageIcon> {
         future: loadImage(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return  SizedBox(
+            return SizedBox(
               width: widget.size,
               height: widget.size,
               child: const Center(
@@ -348,7 +360,8 @@ class _UserImageIconState extends State<UserImageIcon> {
               ),
             );
           }
-          return SizedBox(width: widget.size, height: widget.size, child: buildImage());
+          return SizedBox(
+              width: widget.size, height: widget.size, child: buildImage());
         });
   }
 
