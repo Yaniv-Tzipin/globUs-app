@@ -3,9 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/route_manager.dart';
 import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/matching_page.dart';
+import 'package:myfirstapp/pages/preferences_page.dart';
 import 'package:myfirstapp/pages/profile_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 import 'package:myfirstapp/queries/users_quries.dart';
@@ -85,7 +88,8 @@ class _NavigationExampleState extends State<NavigationExample>
     }
 
     // if we were granted permissions
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best);
   }
 
   @override
@@ -102,8 +106,7 @@ class _NavigationExampleState extends State<NavigationExample>
 
           // if we reached here, we have data
           // updating the current location of the user
-          if(snapshot.data != null)
-          {
+          if (snapshot.data != null) {
             lat = snapshot.data.latitude.toString();
             long = snapshot.data.longitude.toString();
           }
@@ -124,7 +127,19 @@ class _NavigationExampleState extends State<NavigationExample>
               backgroundColor: Colors.transparent,
               elevation: 0,
               actions: [
-                IconButton(onPressed: signUserOut, icon: Icon(Icons.logout)),
+                Row(
+                  children: [
+                    // sliders icon to change preferences
+                    GestureDetector(
+                        child: FaIcon(FontAwesomeIcons.sliders, size: 20),
+                        onTap: () {
+                          Get.to(const PreferencesPage());
+                        }),
+                    SizedBox(width: 10),
+                    IconButton(
+                        onPressed: signUserOut, icon: Icon(Icons.logout)),
+                  ],
+                )
               ],
             ),
             bottomNavigationBar: NavigationBar(

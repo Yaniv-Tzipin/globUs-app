@@ -7,7 +7,7 @@ import 'package:myfirstapp/models/user.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 
 class MatchesService {
-//get instance of auth, chat service and firestore
+  //get instance of chat service and firestore
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
   final ChatService _chatService = ChatService();
   late int sharedTags;
@@ -16,11 +16,11 @@ class MatchesService {
   late int countryCoeff;
   late double rank; // will hold the rank of the current potential match
   late double distance;
-  final int distancWeight;
-  final int tagsWeight;
-  final int originCountryWeight;
-  final int ageWeight;
-  final int swipeWeight;
+  num distancWeight;
+  num tagsWeight;
+  num originCountryWeight;
+  num ageWeight;
+  num swipeWeight;
 
 // will hold the emails of the potential matches
   late List<dynamic> potentialMatchesEmails;
@@ -49,12 +49,10 @@ class MatchesService {
         potentialMatch.swipedLeft, potentialMatch.swipedRight);
     sharedTags = sharedTagsAmount(potentialMatch.tags);
     ageDiff = getAgeDiff(potentialMatch.age);
-// todo: change it to a distance method when we choose a suitable package
+    // todo: change it to a distance method when we choose a suitable package
     distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
     rank = getFinalRank();
-    print(potentialMatch.email);
-    print(distance);
-// updating the potential matches cards list
+    // updating the potential matches cards list
     cards.add(MyMatchCard(cardRanking: rank, userEmail: potentialMatch.email));
   }
 
@@ -76,6 +74,8 @@ class MatchesService {
     return (potentialMatchAge - currentUser.age).abs();
   }
 
+// A method that calculates the distance between the current user and the
+// current potential match
   double calcDistance(String potentialMatchLat, String potentialMatchLong) {
     double distanceInMeters;
     if (potentialMatchLat == "" ||
@@ -124,10 +124,49 @@ class MatchesService {
         swipingScore;
   }
 
+  void scalePreferences(Map<String, dynamic> userPreferences) {
+// will hold the sum of all rangeSliders values
+    num sum = 0;
+    for (String key in userPreferences.keys) {
+      sum += userPreferences[key];
+    }
+
+    // if sum == 0 don't do anything and use the default weights
+    if (sum != 0) {
+      // getting the customed preferences
+      ageWeight = userPreferences['Age'] / sum * 100;
+      distancWeight = userPreferences['Location'] / sum * 100;
+      originCountryWeight = userPreferences['Origin country'] / sum * 100;
+      swipeWeight = userPreferences['Other Party Swipe'] / sum * 100;
+      tagsWeight = userPreferences['Shared tags'] / sum * 100;
+    }
+  }
+
+  // a method that sets the user preferences if they exist
+  void setCustomedWeights(AsyncSnapshot<dynamic> snapshot2) {
+    try {
+      Map<String, dynamic> userPreferences = snapshot2.data!.get('preferences');
+      // scaling the preferences so that they will sum up to 100
+      scalePreferences(userPreferences);
+    } catch (e) {
+      // if the user did not change the preferences we will reach here
+      // and we will use the default values that we defined in the constructor
+      print(e);
+    }
+    print(ageWeight);
+    print(distancWeight);
+    print(originCountryWeight);
+    print(swipeWeight);
+    print(tagsWeight);
+
+  }
+
 //get potential matches
   void loadPotenitalMatches(
       AsyncSnapshot<dynamic> snapshot1, AsyncSnapshot<dynamic> snapshot2) {
     try {
+      // getting the preferences of the user
+      setCustomedWeights(snapshot2);
       // initiating the variables with empty lists
       cards = [];
       potentialMatchesEmails = [];

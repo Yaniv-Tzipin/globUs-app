@@ -179,4 +179,40 @@ class UserQueries {
       print(e);
     }
   }
+
+  static Future<Map<String, dynamic>> loadPreferences() async {
+    String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+    Map<String, dynamic> preferences;
+    try {
+      preferences = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentEmail)
+          .get()
+          .then((snapshot) {
+        return snapshot.data()!['preferences'];
+      });
+    } catch (e) {
+      print(e);
+      return {
+        'Age': 0.0,
+        'Location': 0.0,
+        'Origin country': 0.0,
+        'Other Party Swipe': 0.0,
+        'Shared tags': 0.0
+      };
+    }
+    return preferences;
+  }
+
+  static Future<void> updatePreferences(Map<String, dynamic> preferences) async {
+    String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentEmail)
+          .set({'preferences': preferences}, SetOptions(merge: true));
+    } catch (e) {
+      print(e);
+    }
+  }
 }
