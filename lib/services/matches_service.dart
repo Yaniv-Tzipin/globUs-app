@@ -124,8 +124,9 @@ class MatchesService {
         swipingScore;
   }
 
+  // a method that scales the preferences such that they sum up to 100
   void scalePreferences(Map<String, dynamic> userPreferences) {
-// will hold the sum of all rangeSliders values
+    // will hold the sum of all rangeSliders values
     num sum = 0;
     for (String key in userPreferences.keys) {
       sum += userPreferences[key];
@@ -153,12 +154,6 @@ class MatchesService {
       // and we will use the default values that we defined in the constructor
       print(e);
     }
-    print(ageWeight);
-    print(distancWeight);
-    print(originCountryWeight);
-    print(swipeWeight);
-    print(tagsWeight);
-
   }
 
 //get potential matches

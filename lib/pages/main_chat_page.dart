@@ -14,7 +14,7 @@ class MainChatPage extends StatefulWidget {
 
 class _MainChatPageState extends State<MainChatPage> {
   final ChatService _chatService = ChatService();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;   
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   // will hold all usernames except for the username of the current user
   List<String> allOtherUsernames = [];
   // will hold the emails except for the email of the current user
@@ -155,7 +155,7 @@ class _MainChatPageState extends State<MainChatPage> {
     // check if the current document represents a user that did not
     // talk with the current user
     if (usersWithoutChat.contains(data['username'])) {
-        return buildListItem(data, 'email', 'username');
+      return buildListItem(data, 'email', 'username');
     } else {
       return Container();
     }
@@ -178,7 +178,7 @@ class _MainChatPageState extends State<MainChatPage> {
       // from the usersWithoutChat list
       usersWithoutChat
           .removeWhere((element) => element == data['${prefix}Username']);
-      
+
       // this method will build the list item
       return buildListItem(data, '${prefix}Email', '${prefix}Username');
     } catch (e) {
@@ -187,47 +187,46 @@ class _MainChatPageState extends State<MainChatPage> {
     }
   }
 
-  Widget buildListItem(Map<String, dynamic> data, String emailFieldName, 
-  String usernameFieldName)
-  {
-      ScrollController scrollController = ScrollController();
-      // will build the user's image
-      UserImageIcon userImageIcon =
-          UserImageIcon(userMail: data[emailFieldName]);
-      // when filteredItems is empty, no query was called yet, so display
-      // all other usernames. If filteredItems is not empty, there are results
-      // for the search query so show just these results
-      if (filteredItems.isEmpty ||
-          filteredItems.contains(data[usernameFieldName])) {
-        return ListTile(
-            //receiver's profile image
-            leading: userImageIcon,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            shape: const RoundedRectangleBorder(
-              side: BorderSide(color: Colors.white, width: 0.3),
-            ),
-            tileColor: const Color.fromARGB(255, 228, 236, 232),
-            // show user's username
-            title: Row(children: [
-              Text(data[usernameFieldName]),
-              const SizedBox(width: 5),
-              // add status icon
-              statusIcon(data)
-            ]),
-            // show last message sent
-            subtitle: getLastMessage(data[emailFieldName]),
-            // pass the clicked user's email and username to the chat page
-            onTap: () => {
-                  Get.to(ChatPage(
-                      receiverUserEmail: data[emailFieldName],
-                      receiverUsername: data[usernameFieldName],
-                      scrollController: scrollController,
-                      userImageIcon: userImageIcon))
-                });
-      } else {
-        return Container();
-      }
+  Widget buildListItem(Map<String, dynamic> data, String emailFieldName,
+      String usernameFieldName) {
+    ScrollController scrollController = ScrollController();
+    // will build the user's image
+    UserImageIcon userImageIcon =
+        UserImageIcon(userMail: data[emailFieldName], size: 60);
+    // when filteredItems is empty, no query was called yet, so display
+    // all other usernames. If filteredItems is not empty, there are results
+    // for the search query so show just these results
+    if (filteredItems.isEmpty ||
+        filteredItems.contains(data[usernameFieldName])) {
+      return ListTile(
+          //receiver's profile image
+          leading: userImageIcon,
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          shape: const RoundedRectangleBorder(
+            side: BorderSide(color: Colors.white, width: 0.3),
+          ),
+          tileColor: const Color.fromARGB(255, 228, 236, 232),
+          // show user's username
+          title: Row(children: [
+            Text(data[usernameFieldName]),
+            const SizedBox(width: 5),
+            // add status icon
+            statusIcon(data)
+          ]),
+          // show last message sent
+          subtitle: getLastMessage(data[emailFieldName]),
+          // pass the clicked user's email and username to the chat page
+          onTap: () => {
+                Get.to(ChatPage(
+                    receiverUserEmail: data[emailFieldName],
+                    receiverUsername: data[usernameFieldName],
+                    scrollController: scrollController,
+                    userImageIcon: userImageIcon))
+              });
+    } else {
+      return Container();
+    }
   }
 
 //get last message in chatroom
@@ -393,8 +392,9 @@ class _MainChatPageState extends State<MainChatPage> {
 
 //this section is responsible for showing the profile images of the users
 class UserImageIcon extends StatefulWidget {
+  final double size;
   final String userMail;
-  const UserImageIcon({super.key, required this.userMail});
+  const UserImageIcon({super.key, required this.userMail, required this.size});
 
   @override
   State<UserImageIcon> createState() => _UserImageIconState();
@@ -429,15 +429,15 @@ class _UserImageIconState extends State<UserImageIcon> {
         future: loadImage(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-              width: 60,
-              height: 60,
+            return SizedBox(
+              width: widget.size,
+              height: widget.size,
               child: Center(
                 child: CircularProgressIndicator(),
               ),
             );
           }
-          return SizedBox(width: 60, height: 60, child: buildImage());
+          return SizedBox(width: widget.size, height: widget.size , child: buildImage());
         });
   }
 

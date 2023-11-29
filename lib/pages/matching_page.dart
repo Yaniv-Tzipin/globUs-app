@@ -53,13 +53,11 @@ class _MatchingBoardState extends State<MatchingBoard> {
                 if (snapshot2.connectionState == ConnectionState.waiting) {
                   return const Text('loading...');
                 }
-                print('i');
-// updating cards list to containg potential matches
+                // updating cards list to containg potential matches
                 _matchService.loadPotenitalMatches(snapshot1, snapshot2);
                 cards = _matchService.getCards();
-// sorting the cards by ranking
+                // sorting the cards by ranking
                 cards.sort();
-                print(cards.length);
 
                 if (cards.isEmpty) {
                   return Container();

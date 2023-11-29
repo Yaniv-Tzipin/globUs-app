@@ -204,13 +204,36 @@ class UserQueries {
     return preferences;
   }
 
-  static Future<void> updatePreferences(Map<String, dynamic> preferences) async {
+  static Future<void> updatePreferences(
+      Map<String, dynamic> preferences) async {
     String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
     try {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(currentEmail)
           .set({'preferences': preferences}, SetOptions(merge: true));
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<void> addEndoresement(String endorsedEmail, String endoresementContent) async {
+    String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
+    String currentUsername = await getUsername(currentEmail);
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(endorsedEmail)
+          .set({
+        'endorsements': FieldValue.arrayUnion([
+          {
+            'writerEmail': currentEmail,
+            'writwrUsername': currentUsername,
+            'endoresementTime': Timestamp.now(),
+            'endoresementContent': endoresementContent
+          }
+        ])
+      }, SetOptions(merge: true));
     } catch (e) {
       print(e);
     }
