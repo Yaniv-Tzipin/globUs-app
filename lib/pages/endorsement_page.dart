@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
@@ -23,7 +22,7 @@ class _EndorsementPageState extends State<EndorsementPage> {
   final endorsementController = TextEditingController();
 
   void updateEndorsements(String endorsedEmail) async {
-    UserQueries.addEndoresement(endorsedEmail, endorsementController.text);
+    UserQueries.addEndorsement(endorsedEmail, endorsementController.text);
   }
   //todo: once Save is pressed, reload profile page automatically
 

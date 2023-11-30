@@ -1,14 +1,16 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/models/user.dart';
+import 'package:myfirstapp/pages/main_chat_page.dart';
+import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:shadow_overlay/shadow_overlay.dart';
 
 class MyMatchCard extends StatefulWidget implements Comparable {
   final double cardRanking;
   final String userEmail;
+
   const MyMatchCard(
       {super.key, required this.cardRanking, required this.userEmail});
 
@@ -96,9 +98,26 @@ class _CardContentState extends State<CardContent> {
               child: Align(
                   alignment: Alignment.topLeft,
                   child: myTagsBuilder(potentialPartnerTags)),
-            )
+            ),
 
             ///!!! to add my endoursments !!!\\\
+
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Endorsements',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: buildEndorsements(currentUser.email),
+                    ),
+                  ],
+                ))
           ],
         ),
       ),
@@ -212,5 +231,57 @@ class _CardContentState extends State<CardContent> {
       alignment: WrapAlignment.spaceEvenly,
       children: ListOfTagsToDisplay,
     );
+  }
+
+  Widget buildEndorsements(String endorsementWriterEmail) {
+    return FutureBuilder(
+        future: UserQueries.getEndorsements(endorsementWriterEmail),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasError) {
+            return Text("error");
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+          // saving the data
+          List<dynamic> endorsements = snapshot.data;
+
+          List<Widget> listOfEndorsements = endorsements
+              .map<Widget>((endorsement) => buildEndorsementItem(endorsement))
+              .toList();
+          return ListView(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            children: listOfEndorsements,
+          );
+        });
+  }
+
+  Widget buildEndorsementItem(Map<String, dynamic> endorsement) {
+    // will build the endorsement writer image
+    UserImageIcon userImageIcon =
+        UserImageIcon(userMail: endorsement['writerEmail'], size: 60);
+    // saving endorsement timeStamp
+    var date = DateTime.fromMillisecondsSinceEpoch(
+        endorsement['endorsementTime'].millisecondsSinceEpoch);
+    var formattedDate = "${date.day}-${date.month}-${date.year}";
+
+    return ListTile(
+        //endorsement writer image
+        leading: userImageIcon,
+        contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        shape: const RoundedRectangleBorder(
+          side: BorderSide(color: Colors.white, width: 0.3),
+        ),
+        tileColor: const Color.fromARGB(255, 228, 236, 232),
+        // show endorsement writer username
+        title: Row(children: [
+          Text(endorsement['writerUsername']),
+          const SizedBox(width: 5),
+          // show endorsement timestamp
+          Text(formattedDate)
+        ]),
+        // show endorsement content
+        subtitle: Text(endorsement['endorsementContent']));
   }
 }

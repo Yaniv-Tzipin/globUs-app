@@ -217,7 +217,8 @@ class UserQueries {
     }
   }
 
-  static Future<void> addEndoresement(String endorsedEmail, String endoresementContent) async {
+  static Future<void> addEndorsement(
+      String endorsedEmail, String endoresementContent) async {
     String currentEmail = FirebaseAuth.instance.currentUser?.email ?? "";
     String currentUsername = await getUsername(currentEmail);
     try {
@@ -228,14 +229,31 @@ class UserQueries {
         'endorsements': FieldValue.arrayUnion([
           {
             'writerEmail': currentEmail,
-            'writwrUsername': currentUsername,
-            'endoresementTime': Timestamp.now(),
-            'endoresementContent': endoresementContent
+            'writerUsername': currentUsername,
+            'endorsementTime': Timestamp.now(),
+            'endorsementContent': endoresementContent
           }
         ])
       }, SetOptions(merge: true));
     } catch (e) {
       print(e);
     }
+  }
+
+  static Future<List<dynamic>> getEndorsements(
+      String email) async {
+    List<dynamic> endorsements;
+    try {
+      endorsements = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(email)
+          .get()
+          .then((snapshot) {
+        return snapshot.data()!['endorsements'];
+      });
+    } catch (e) {
+      return [];
+    }
+    return endorsements;
   }
 }
