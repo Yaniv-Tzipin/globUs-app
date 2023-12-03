@@ -191,7 +191,9 @@ class ChatService extends ChangeNotifier {
       'firstUsername': firstUsername,
       'secondEmail': secondEmail,
       'secondUsername': secondUsername,
-      'lastMessageTimeStamp': Timestamp.now()
+      'lastMessageTimeStamp': Timestamp.now(),
+      '${firstEmail}_unread': 0,
+      '${secondEmail}_unread': 0
 
     };
     await _fireStore.collection('chat_rooms').doc(uniqueChatRoomID).set(data);

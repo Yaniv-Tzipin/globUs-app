@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/chat_bubble.dart';
 import 'package:myfirstapp/components/my_textfield.dart';
+import 'package:myfirstapp/pages/endorsement_page.dart';
 import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/services/chat/chat_services.dart';
 
@@ -29,14 +32,11 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage() async {
     //only send if there's something to send
-    if (_messageController.text.isNotEmpty) { 
+    if (_messageController.text.isNotEmpty) {
       String message = _messageController.text;
       // clear the text controller after sending the message
       _messageController.clear();
-      await _chatService.sendMessage(
-          widget.receiverUserEmail, message);
-      
-      
+      await _chatService.sendMessage(widget.receiverUserEmail, message);
     }
   }
 
@@ -46,15 +46,33 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              // the user opened the chat so updating the unread messages num to zero
-              _chatService.updateUnreadMessagesCount(
-                  currentUserMail, widget.receiverUserEmail, 0);
-              _chatService.totalUnreadMessagesCount();
-              Navigator.pop(context);
-            }),
+        leading: Row(
+          children: [
+            IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  // the user opened the chat so updating the unread messages num to zero
+                  _chatService.updateUnreadMessagesCount(
+                      currentUserMail, widget.receiverUserEmail, 0);
+                  _chatService.totalUnreadMessagesCount();
+                  Navigator.pop(context);
+                }),
+            Expanded(
+              child: IconButton(
+                padding: EdgeInsets.only(top: 5),
+                onPressed: () {
+                  Get.to(EndorsementPage(
+                    endorsedUserEmail: widget.receiverUserEmail,
+                    endorsedUserUsername: widget.receiverUsername,
+                  ));
+                },
+                icon: const Icon(Icons.favorite_rounded),
+                iconSize: 35,
+                color: const Color.fromARGB(255, 240, 119, 105),
+              ),
+            ),
+          ],
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 30),

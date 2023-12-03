@@ -67,7 +67,11 @@ class _MatchingBoardState extends State<MatchingBoard> {
                   color: Colors.white, fontSize: 18),
                   textAlign: TextAlign.center,);
                   
-                } else {
+                } 
+                else {
+                  if(cards.length > 20){
+                    cards = cards.sublist(0,19);
+                  }
                   return Scaffold(
                       body: SafeArea(
                     child: Column(children: [

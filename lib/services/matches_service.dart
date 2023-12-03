@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/components/my_match_card.dart';
 import 'package:myfirstapp/models/user.dart';
@@ -17,11 +18,11 @@ class MatchesService {
   late int countryCoeff;
   late double rank; // will hold the rank of the current potential match
   late double distance;
-  final int distancWeight;
-  final int tagsWeight;
-  final int originCountryWeight;
-  final int ageWeight;
-  final int swipeWeight;
+  num distancWeight;
+  num tagsWeight;
+  num originCountryWeight;
+  num ageWeight;
+  num swipeWeight;
 
 // will hold the emails of the potential matches
   late List<dynamic> potentialMatchesEmails;
@@ -39,10 +40,42 @@ class MatchesService {
       this.ageWeight = 10,
       this.swipeWeight = 3});
 
+ void scalePreferences(Map<String, dynamic> userPreferences) {
+// will hold the sum of all rangeSliders values
+    num sum = 0;
+    for (String key in userPreferences.keys) {
+      sum += userPreferences[key];
+    }
+
+    // if sum == 0 don't do anything and use the default weights
+    if (sum != 0) {
+      // getting the customed preferences
+      ageWeight = userPreferences['Age'] / sum * 100;
+      distancWeight = userPreferences['Location'] / sum * 100;
+      originCountryWeight = userPreferences['Origin country'] / sum * 100;
+      swipeWeight = userPreferences['Other Party Swipe'] / sum * 100;
+      tagsWeight = userPreferences['Shared tags'] / sum * 100;
+    }
+  }
+
+  // a method that sets the user preferences if they exist
+  void setCustomedWeights(AsyncSnapshot<dynamic> snapshot2) {
+    try {
+      Map<String, dynamic> userPreferences = snapshot2.data!.get('preferences');
+      // scaling the preferences so that they will sum up to 100
+      scalePreferences(userPreferences);
+    } catch (e) {
+      // if the user did not change the preferences we will reach here
+      // and we will use the default values that we defined in the constructor
+      print(e);
+    }
+  }
+
   void calcGrade(DocumentSnapshot document) {
 // will hold the potential match fields
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     UserProfile potentialMatch = UserProfile(data);
+    print(potentialMatch.email);
 
     potentialMatch.originCountry == currentUser.originCountry
         ? countryCoeff = 1
@@ -51,11 +84,35 @@ class MatchesService {
         potentialMatch.swipedLeft, potentialMatch.swipedRight);
     sharedTags = sharedTagsAmount(potentialMatch.tags);
     ageDiff = getAgeDiff(potentialMatch.age);
-// todo: change it to a distance method when we choose a suitable package
-    distance = 0;
+distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
     rank = getFinalRank();
+    
 // updating the potential matches cards list
     cards.add(MyMatchCard(cardRanking: rank, userEmail: potentialMatch.email));
+  }
+
+
+  double calcDistance(String potentialMatchLat, String potentialMatchLong) {
+    double distanceInMeters;
+    if (potentialMatchLat == "" ||
+        potentialMatchLong == "" ||
+        currentUser.latitude == "" ||
+        currentUser.longitude == "") {
+      return 0;
+    } else {
+      try {
+
+        distanceInMeters = GeolocatorPlatform.instance.distanceBetween(
+            double.parse(potentialMatchLat),
+            double.parse(potentialMatchLong),
+            double.parse(currentUser.latitude),
+            double.parse(currentUser.longitude));
+      } catch (e) {
+        print(e);
+        return 0;
+      }
+      return distanceInMeters / 1000;
+    }
   }
 
 // A method that returns the number of shared tags between the current
@@ -107,6 +164,7 @@ class MatchesService {
       AsyncSnapshot<dynamic> snapshot1, AsyncSnapshot<dynamic> snapshot2) {
     
     try {
+      setCustomedWeights(snapshot2);
       cards = [];
       potentialMatchesEmails = [];
       currentUserMatches = [];
@@ -123,7 +181,7 @@ class MatchesService {
 // the potential matches to the list
       for (DocumentSnapshot doc in snapshot1.data!.docs) {
         String currentDocEmail = doc.get('email');
-        if (currentDocEmail != currentUser.email &&
+        if (currentDocEmail != _firebaseAuth.currentUser?.email &&
             !currentUserMatches.contains(currentDocEmail) &&
             !currentUserSwipedRight.contains(currentDocEmail) &&
             !currentUserSwipedLeft.contains(currentDocEmail)) {
@@ -166,7 +224,7 @@ class MatchesService {
         String chatRoomId =
             _chatService.getChatRoomId(currentUserEmail, cardsOwnerEmail);
         await _chatService.createANewChatRoom(chatRoomId, cardsOwnerEmail,
-            secondUsername, currentUserEmail, currentUser.username);
+            secondUsername, currentUserEmail, _firebaseAuth.currentUser?.email ?? "");
         return true;
       } else {
         return false;
