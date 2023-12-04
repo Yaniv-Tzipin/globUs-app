@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
+import 'package:myfirstapp/components/my_date_picker.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
@@ -9,11 +10,14 @@ import 'package:myfirstapp/globals.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/home_page.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
+import 'package:myfirstapp/services/helpers.dart';
 import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   List<String> stringTags = [];
-  EditProfilePage({super.key,});
+  EditProfilePage({
+    super.key,
+  });
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -22,9 +26,12 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final usernameController = TextEditingController();
   final bioController = TextEditingController();
+  final birthDateController = TextEditingController();
 
   void updateDB() async {
-    Map<String, TextEditingController> controllers = {"bio": bioController};
+    Map<String, TextEditingController> controllers = {
+      "bio": bioController
+    };
     for (MapEntry<String, TextEditingController> entry in controllers.entries) {
       TextEditingController controller = entry.value;
       if (controller.text.isNotEmpty) {
@@ -34,17 +41,26 @@ class _EditProfilePageState extends State<EditProfilePage> {
             .update({entry.key: controller.text});
       }
     }
+    if(birthDateController.text.isNotEmpty){
+      FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.email)
+            .update({"birth_date": parseStringToTimestamp(birthDateController.text)});
+    }
 
     //todo: once Save is pressed, reload profile page automatically
   }
 
-  void updateTagsInDB(List<String> tagsString){
-    FirebaseFirestore.instance.collection('users').doc(currentUser.email).update({'tags': tagsString});
+  void updateTagsInDB(List<String> tagsString) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.email)
+        .update({'tags': tagsString});
   }
 
-  void appBarOnPressed(){
+  void appBarOnPressed() {
     updateTagsInDB(widget.stringTags);
-    Get.to( HomePage());
+    Get.to(HomePage());
   }
 
   @override
@@ -53,7 +69,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
-        leading: BackButton(color: Colors.grey[800], onPressed: appBarOnPressed),
+        leading:
+            BackButton(color: Colors.grey[800], onPressed: appBarOnPressed),
         toolbarHeight: 40,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -77,9 +94,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             const SizedBox(height: 30),
             buildMyTags(),
+            buildDatePicker(birthDateController),
             MyButton(onTap: updateDB, text: 'Save'),
           ]),
     );
+  }
+
+  Widget buildDatePicker(TextEditingController birthDateController) {
+    return MyDatePicker(dateController: birthDateController);
   }
 
   Widget buildMyTags() {
@@ -98,7 +120,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             IconButton(onPressed: goToChooseTags, icon: Icon(Icons.edit))
           ],
         ),
-        AbsorbPointer(child: MyTagsGrid(icon: const Icon(Icons.check_rounded), listOfTags: myTags)),
+        AbsorbPointer(
+            child: MyTagsGrid(
+                icon: const Icon(Icons.check_rounded), listOfTags: myTags)),
       ],
     );
   }
@@ -106,7 +130,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void goToChooseTags() async {
     var tagsCounter = Provider.of<MyTagsProvider>(context, listen: false);
     for (String tag in currentUser.tags) {
-      tagsCounter.addTagToChosen(Chip(label: Text(tag),));
+      tagsCounter.addTagToChosen(Chip(
+        label: Text(tag),
+      ));
     }
     await Get.to(MyTags());
     for (Chip tagChip in tagsCounter.chosenTags) {
@@ -115,5 +141,4 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
     // updateTagsInDB(stringTags);
   }
-
 }
