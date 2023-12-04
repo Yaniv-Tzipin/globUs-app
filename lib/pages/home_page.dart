@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/route_manager.dart';
+import 'package:myfirstapp/pages/login_or_register_page.dart';
 import 'package:myfirstapp/pages/main_chat_page.dart';
 import 'package:myfirstapp/pages/matching_page.dart';
 import 'package:myfirstapp/pages/preferences_page.dart';
@@ -64,6 +65,7 @@ class _NavigationExampleState extends State<NavigationExample>
   //sign user out method, snapshot loosing data
   void signUserOut() {
     FirebaseAuth.instance.signOut();
+    Get.to(LoginOrRegisterPage(showLoginPage: true));
   }
 
   Future<Position?> getCurentLocation() async {
