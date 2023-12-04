@@ -46,6 +46,10 @@ dependencies:
   country_list_pick: ^1.0.1+6
   firebase_storage: ^11.4.1
   path: ^1.8.0
+  flutter_card_swiper: ^6.0.0
+  shadow_overlay: ^1.0.5
+  geolocator: ^10.1.0
+  font_awesome_flutter: ^10.6.0
   
 
 dev_dependencies:
