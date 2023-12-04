@@ -5,15 +5,15 @@ import "package:provider/provider.dart";
 import 'package:myfirstapp/components/my_colors.dart' as my_colors;
 
 class MyTags extends StatefulWidget {
-  const MyTags({super.key});
+  final bool? isEditProfilePage = false;
+
+  const MyTags({super.key, isEditProfilePage = false});
 
   @override
   State<MyTags> createState() => _MyTagsState();
 }
 
-class _MyTagsState extends State<MyTags>{
-
-
+class _MyTagsState extends State<MyTags> {
   @override
   Widget build(BuildContext context) {
     final tagsCounter = Provider.of<MyTagsProvider>(context);
@@ -50,7 +50,7 @@ class _MyTagsState extends State<MyTags>{
       MyTag(tagsCounter: tagsCounter, text: 'tv'),
       MyTag(tagsCounter: tagsCounter, text: 'animals'),
       MyTag(tagsCounter: tagsCounter, text: 'cruising')
-      ];
+    ];
     List<MyTag> personalityTags = [
       MyTag(tagsCounter: tagsCounter, text: 'adventurous'),
       MyTag(tagsCounter: tagsCounter, text: 'catperson'),
@@ -115,11 +115,13 @@ class _MyTagsState extends State<MyTags>{
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-          elevation: 0,
-           toolbarHeight: 40,
-            title: Text('My Tags $tagsCount/10'),
-             centerTitle: true,
-             backgroundColor: my_colors.toolBarColor,),
+        // leading: BackButton(color: Colors.grey[800], onPressed: () => Get.to(EditProfilePage())),
+        elevation: 0,
+        toolbarHeight: 40,
+        title: Text('My Tags $tagsCount/10'),
+        centerTitle: true,
+        backgroundColor: my_colors.toolBarColor,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -132,15 +134,16 @@ class _MyTagsState extends State<MyTags>{
                 child: Text(
                   'Add up to 10 tags to your profile that best describe you',
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            MyTagsGrid(tagsTheme: 'My Tags',
-             icon: const Icon(Icons.check_rounded),
-            listOfTags: chosenTagsList),
+            MyTagsGrid(
+                tagsTheme: 'My Tags',
+                icon: const Icon(Icons.check_rounded),
+                listOfTags: chosenTagsList),
             const SizedBox(
               height: 20,
             ),
@@ -157,11 +160,11 @@ class _MyTagsState extends State<MyTags>{
               listOfTags: personalityTags,
               tagsTheme: 'Traits',
             ),
-      
-            MyTagsGrid(tagsTheme: 'Travel Wishlist',
-             icon: const Icon(Icons.travel_explore),
-            listOfTags: wishListTags,)
-      
+            MyTagsGrid(
+              tagsTheme: 'Travel Wishlist',
+              icon: const Icon(Icons.travel_explore),
+              listOfTags: wishListTags,
+            )
           ],
         ),
       ),
@@ -173,65 +176,58 @@ class _MyTagsState extends State<MyTags>{
 
 class MyTag extends StatefulWidget {
   final String text;
-   const MyTag({
-    super.key,
-    required this.tagsCounter, 
+  const MyTag({
+        super.key,
+    required this.tagsCounter,
     required this.text,
   });
 
   final MyTagsProvider tagsCounter;
-  
+
   @override
   State<MyTag> createState() => _MyTagState();
 }
 
 class _MyTagState extends State<MyTag> {
   bool isSelected = false;
-  bool ableToAddTag(){
-      return widget.tagsCounter.count != 10;
-    }
+  bool ableToAddTag() {
+    return widget.tagsCounter.count != 10;
+  }
 
   @override
   Widget build(BuildContext context) {
+    isSelected = widget.tagsCounter.isPressed(widget);
 
-    isSelected = widget.tagsCounter.isPressed(widget); 
-    
-    return InputChip(label: Text(widget.text),
+    return InputChip(
+        label: Text(widget.text),
 
-    //logic regarding pressing on the tag
-    onSelected: (bool newBool){
-  
-      if(!widget.tagsCounter.isPressed(widget)){
-      if(ableToAddTag()){
-      isSelected = !isSelected;
-      widget.tagsCounter.increment();
-      widget.tagsCounter.addTagToPressed(widget);
+        //logic regarding pressing on the tag
+        onSelected: (bool newBool) {
+          if (!widget.tagsCounter.isPressed(widget)) {
+            if (ableToAddTag()) {
+              isSelected = !isSelected;
+              widget.tagsCounter.increment();
+              widget.tagsCounter.addTagToPressed(widget);
 
-      //converting the tag to a chip that can't be pressed and is added to the 
-      //chosen tags grid
-      widget.tagsCounter.addTagToChosen(Chip(label: Text(widget.text),));
-      }
-      }
-      else{
-      isSelected = !isSelected;
-      widget.tagsCounter.decrement();
+              //converting the tag to a chip that can't be pressed and is added to the
+              //chosen tags grid
+              widget.tagsCounter.addTagToChosen(Chip(
+                label: Text(widget.text),
+              ));
+            }
+          } else {
+            isSelected = !isSelected;
+            widget.tagsCounter.decrement();
 
-      //converting the tag to a chip that can't be pressed and is removed from the 
-      //chosen tags grid
-      widget.tagsCounter.removeTagFromChosen(
-        Chip(label: Text(widget.text),)
-      );
-      widget.tagsCounter.removeTagFromPressed(
-        widget
-      );
-      }
-
-    },
-    selected: isSelected,
-    selectedColor: my_colors.selectedTagColor)
-    ;
+            //converting the tag to a chip that can't be pressed and is removed from the
+            //chosen tags grid
+            widget.tagsCounter.removeTagFromChosen(Chip(
+              label: Text(widget.text),
+            ));
+            widget.tagsCounter.removeTagFromPressed(widget);
+          }
+        },
+        selected: isSelected,
+        selectedColor: my_colors.selectedTagColor);
   }
-
 }
-
-
