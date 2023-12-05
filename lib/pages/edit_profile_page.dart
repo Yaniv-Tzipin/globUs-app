@@ -15,7 +15,9 @@ import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   List<String> stringTags = [];
-  EditProfilePage({super.key,});
+  EditProfilePage({
+    super.key,
+  });
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -39,15 +41,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     //todo: once Save is pressed, reload profile page automatically
   }
-  
 
-  void updateTagsInDB(List<String> tagsString){
-    FirebaseFirestore.instance.collection('users').doc(currentUser.email).update({'tags': tagsString});
+  void updateTagsInDB(List<String> tagsString) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.email)
+        .update({'tags': tagsString});
   }
 
-  void appBarOnPressed(){
+  void appBarOnPressed() {
     updateTagsInDB(widget.stringTags);
-    Get.to( HomePage());
+    Get.to(HomePage());
   }
 
   @override
@@ -56,7 +60,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         foregroundColor: Colors.grey[800],
-        leading: BackButton(color: Colors.grey[800], onPressed: appBarOnPressed),
+        leading:
+            BackButton(color: Colors.grey[800], onPressed: appBarOnPressed),
         toolbarHeight: 40,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -85,10 +90,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
+
   Widget buildMyTags() {
     List<InputChip> myTags = currentUser.tags
-        .map((x) => InputChip(label: Text(x),selected: true, selectedColor: selectedTagColor,labelStyle: const TextStyle(color: Colors.black),elevation: 0,))
+        .map((x) => InputChip(
+              label: Text(x),
+              selected: true,
+              selectedColor: selectedTagColor,
+              labelStyle: const TextStyle(color: Colors.black),
+              elevation: 0,
+            ))
         .toList();
+
     return Column(
       children: [
         Row(
@@ -100,7 +113,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
             IconButton(onPressed: goToChooseTags, icon: Icon(Icons.edit))
           ],
         ),
-        AbsorbPointer(child: MyTagsGrid(icon: const Icon(Icons.check_rounded), listOfTags: myTags)),
+        AbsorbPointer(
+            child: MyTagsGrid(
+                icon: const Icon(Icons.check_rounded), listOfTags: myTags)),
       ],
     );
   }
@@ -111,7 +126,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     tagsCounter.chosenTags = [];
     tagsCounter.pressedTags = [];
     for (String tag in currentUser.tags) {
-      tagsCounter.addTagToChosen(Chip(label: Text(tag),));
+      tagsCounter.addTagToChosen(Chip(
+        label: Text(tag),
+      ));
       tagsCounter.addTagToPressed(MyTag(tagsCounter: tagsCounter, text: tag));
       UserQueries.usersTagsToString.add(tag);
       tagsCounter.increment();
@@ -119,11 +136,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     await Get.to(MyTags());
     for (Chip tagChip in tagsCounter.chosenTags) {
       Text txt = tagChip.label as Text;
-      if(!widget.stringTags.contains(txt.data.toString())){
-      widget.stringTags.add(txt.data.toString());}
+      if (!widget.stringTags.contains(txt.data.toString())) {
+        widget.stringTags.add(txt.data.toString());
+      }
       print(txt.data.toString());
     }
     // updateTagsInDB(stringTags);
   }
-
 }

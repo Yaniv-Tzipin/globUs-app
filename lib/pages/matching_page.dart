@@ -69,8 +69,8 @@ class _MatchingBoardState extends State<MatchingBoard> {
                   
                 } 
                 else {
-                  if(cards.length > 20){
-                    cards = cards.sublist(0,19);
+                  if(cards.length > 0){
+                    cards = cards.sublist(0,1);
                   }
                   return Scaffold(
                       body: SafeArea(
