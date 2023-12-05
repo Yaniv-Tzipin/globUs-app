@@ -73,6 +73,7 @@ class _MatchingBoardState extends State<MatchingBoard> {
                     cards = cards.sublist(0,1);
                   }
                   return Scaffold(
+                    backgroundColor: const Color.fromARGB(255, 203, 228, 204),
                       body: SafeArea(
                     child: Column(children: [
                       Flexible(

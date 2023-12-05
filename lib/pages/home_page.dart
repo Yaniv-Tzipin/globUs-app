@@ -119,7 +119,7 @@ class _NavigationExampleState extends State<NavigationExample>
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: const Color.fromARGB(255, 203, 228, 204)),
+                    color: Colors.grey[800]),
               ),
               automaticallyImplyLeading: false,
               foregroundColor: Colors.grey[800],
