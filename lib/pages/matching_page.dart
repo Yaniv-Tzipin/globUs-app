@@ -69,8 +69,8 @@ class _MatchingBoardState extends State<MatchingBoard> {
                   
                 } 
                 else {
-                  if(cards.length > 0){
-                    cards = cards.sublist(0,1);
+                  if(cards.length > 1){
+                    cards = cards.sublist(0,2);
                   }
                   return Scaffold(
                     backgroundColor: const Color.fromARGB(255, 203, 228, 204),
