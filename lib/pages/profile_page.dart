@@ -122,19 +122,23 @@ class _ValidProfilePageState extends State<ValidProfilePage> {
         ),
       );
 
-  Widget buildUserBasicData() => Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Text(
-              "${currentUser.username}, ${currentUser.age}",
-              style: const TextStyle(fontSize: 30),
+  Widget buildUserBasicData() => Flexible(
+    child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                overflow:TextOverflow.fade,
+                "${currentUser.username}, ${currentUser.age}",
+                style: const TextStyle(fontSize: 23),
+              ),
             ),
-          ),
-          Text(
-            currentUser.originCountry,
-            style: const TextStyle(fontSize: 18, color: Colors.grey),
-          )
-        ],
-      );
+            Text(
+              overflow:TextOverflow.fade,
+              currentUser.originCountry,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
+            )
+          ],
+        ),
+  );
 }
