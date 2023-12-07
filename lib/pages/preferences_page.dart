@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
+import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/queries/users_quries.dart';
+import 'package:myfirstapp/components/my_colors.dart';
 
 class PreferencesPage extends StatefulWidget {
   const PreferencesPage({super.key});
@@ -34,22 +37,33 @@ class _PreferencesPageState extends State<PreferencesPage> {
           sliders = snapshot.data;
 
           return Scaffold(
+            backgroundColor: veryBeautifulLightGreen,
               appBar: AppBar(
-                title: const Text(
+                title:  const Text(
                   'Define features importance',
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 139, 189, 139)),
+                      color:Color.fromARGB(255, 58, 58, 58)),
                 ),
               ),
               body: Column(
                 children: [
+                  Image.asset('lib/images/globUsLogo1.png',
+                width: 240),
+                  const SizedBox(height: 10,),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          'Age, importance: ${sliders['Age'].toInt().toString()}'),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20.0),
+                        child: Text(style: TextStyle(fontWeight: FontWeight.bold),
+                            'Age:'),
+                      ),
                       Slider(
+                        inactiveColor: Colors.white,
+                        thumbColor: selectedTagColor,
+                        activeColor: selectedTagColor,
                         value: sliders['Age'].toDouble(),
                         onChanged: (value) {
                           setState(
@@ -64,10 +78,17 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     ],
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          'Location, importance: ${sliders['Location'].toInt().toString()}'),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20.0),
+                        child: Text(style: TextStyle(fontWeight: FontWeight.bold),
+                            'Location:'),
+                      ),
                       Slider(
+                        inactiveColor: Colors.white,
+                        thumbColor: selectedTagColor,
+                        activeColor: selectedTagColor,
                         value: sliders['Location'].toDouble(),
                         onChanged: (value) {
                           setState(
@@ -82,10 +103,17 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     ],
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          'Origin country, importance: ${sliders['Origin country'].toInt().toString()}'),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20.0),
+                        child: Text(style: TextStyle(fontWeight: FontWeight.bold),
+                            'Origin country:'),
+                      ),
                       Slider(
+                        inactiveColor: Colors.white,
+                        thumbColor: selectedTagColor,
+                        activeColor: selectedTagColor,
                         value: sliders['Origin country'].toDouble(),
                         onChanged: (value) {
                           setState(
@@ -100,10 +128,17 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     ],
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          'Other Party Swipe, importance: ${sliders['Other Party Swipe'].toInt().toString()}'),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20.0),
+                        child: Text(style: TextStyle(fontWeight: FontWeight.bold),
+                            'Other Partie\'s preference:'),
+                      ),
                       Slider(
+                        inactiveColor: Colors.white,
+                        thumbColor: selectedTagColor,
+                        activeColor: selectedTagColor,
                         value: sliders['Other Party Swipe'].toDouble(),
                         onChanged: (value) {
                           setState(
@@ -118,10 +153,17 @@ class _PreferencesPageState extends State<PreferencesPage> {
                     ],
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          'Shared tags, importance: ${sliders['Shared tags'].toInt().toString()}'),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 20.0),
+                        child: Text(style: TextStyle(fontWeight: FontWeight.bold),
+                            'Shared tags:'),
+                      ),
                       Slider(
+                        inactiveColor: Colors.white,
+                        thumbColor: selectedTagColor,
+                        activeColor: selectedTagColor,
                         value: sliders['Shared tags'].toDouble(),
                         onChanged: (value) {
                           setState(

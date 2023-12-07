@@ -75,7 +75,7 @@ class _CardContentState extends State<CardContent> {
   Widget build(BuildContext context) {
     // when both the user and the user appearing on the current card allow location services
     // it will show the distance between them, otherwise it won't show anything
-    dynamic cuurentCardKmAway = widget.distance == "" ? "" : ', ${widget.distance.toInt().toString()} km away';
+    dynamic cuurentCardKmAway = widget.distance == "" ? "" : ',${widget.distance.toInt().toString()} km away';
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
