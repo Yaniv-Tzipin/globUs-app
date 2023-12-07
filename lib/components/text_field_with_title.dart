@@ -52,7 +52,7 @@ class _TextFieldWithTitleWidgetState extends State<TextFieldWithTitleWidget> {
             controller: controller,
             decoration: InputDecoration(
               hintText: hintText,
-              hintStyle: TextStyle(color: Colors.grey[400]),
+              hintStyle: TextStyle(color: Colors.grey),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
