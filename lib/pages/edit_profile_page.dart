@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:myfirstapp/components/my_date_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
@@ -31,7 +32,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final birthDateController = TextEditingController();
 
   void updateDB() async {
-    Map<String, TextEditingController> controllers = {"bio": bioController};
+    Map<String, TextEditingController> controllers = {
+      "bio": bioController
+    };
     for (MapEntry<String, TextEditingController> entry in controllers.entries) {
       TextEditingController controller = entry.value;
       if (controller.text.isNotEmpty) {
@@ -41,12 +44,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
             .update({entry.key: controller.text});
       }
     }
-    if (birthDateController.text.isNotEmpty) {
+    if(birthDateController.text.isNotEmpty){
       FirebaseFirestore.instance
-          .collection('users')
-          .doc(currentUser.email)
-          .update(
-              {"birth_date": parseStringToTimestamp(birthDateController.text)});
+            .collection('users')
+            .doc(currentUser.email)
+            .update({"birth_date": parseStringToTimestamp(birthDateController.text)});
     }
 
     //todo: once Save is pressed, reload profile page automatically
@@ -104,8 +106,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  void goToChooseImage() async {
-    await Get.to(const ImageProfile());
+  void goToChooseImage() async{
+        await Get.to(const ImageProfile());
   }
 
   Widget buildDatePicker(TextEditingController birthDateController) {

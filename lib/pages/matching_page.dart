@@ -161,10 +161,11 @@ class _MatchingBoardState extends State<MatchingBoard> {
         await _matchService.checkIfAMatch(currentUser.email, cardsOwnerEmail);
     if (isAMatch) {
       //upsate the matches list in DB
+      Get.to(ItsAMatchPage(currentUserEmail: currentUser.email, cardsOwnerEmail: cardsOwnerEmail,));
       await _matchService.addMatch(currentUser.email, cardsOwnerEmail);
       await _matchService.addMatch(cardsOwnerEmail, currentUser.email);
       await _matchService.deleteSwipedRight(cardsOwnerEmail, currentUser.email);
-      Get.to(ItsAMatchPage(currentUserEmail: currentUser.email, cardsOwnerEmail: cardsOwnerEmail,));
+      
 
       //dothings - to create a pop up page
     } else {
