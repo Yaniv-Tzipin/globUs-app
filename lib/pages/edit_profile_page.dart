@@ -32,9 +32,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final birthDateController = TextEditingController();
 
   void updateDB() async {
-    Map<String, TextEditingController> controllers = {
-      "bio": bioController
-    };
+    Map<String, TextEditingController> controllers = {"bio": bioController};
     for (MapEntry<String, TextEditingController> entry in controllers.entries) {
       TextEditingController controller = entry.value;
       if (controller.text.isNotEmpty) {
@@ -44,14 +42,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             .update({entry.key: controller.text});
       }
     }
-    if(birthDateController.text.isNotEmpty){
-      FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser.email)
-            .update({"birth_date": parseStringToTimestamp(birthDateController.text)});
-    }
-
     //todo: once Save is pressed, reload profile page automatically
+  }
+
+  void updateBirthDate() async {
+    if (birthDateController.text.isNotEmpty) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.email)
+          .update(
+              {"birth_date": parseStringToTimestamp(birthDateController.text)});
+    }
   }
 
   void updateTagsInDB(List<String> tagsString) {
@@ -69,45 +70,69 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        foregroundColor: Colors.grey[800],
-        leading:
-            BackButton(color: Colors.grey[800], onPressed: appBarOnPressed),
-        toolbarHeight: 40,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          physics: const BouncingScrollPhysics(),
-          children: [
-            ProfileWidget(
-                imagePath: currentUser.profileImagePath,
-                onClicked: goToChooseImage,
-                isEdit: true),
-            const SizedBox(
-              height: 20,
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.email)
+            .snapshots(),
+        builder: ((context, snapshot) {
+          return Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              foregroundColor: Colors.grey[800],
+              leading: BackButton(
+                  color: Colors.grey[800], onPressed: appBarOnPressed),
+              toolbarHeight: 40,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
             ),
-            TextFieldWithTitleWidget(
-              label: 'About Me',
-              text: currentUser.bio,
-              maxLines: 5,
-              controller: bioController,
-            ),
-            const SizedBox(height: 30),
-            buildMyTags(),
-            const SizedBox(
-              height: 20,
-            ),
-            buildDatePicker(birthDateController),
-          ]),
-    );
+            body: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  buildProfileWidget() ,
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFieldWithTitleWidget(
+                    label: 'About Me',
+                    text: currentUser.bio,
+                    maxLines: 5,
+                    controller: bioController,
+                  ),
+                  const SizedBox(height: 30),
+                  buildMyTags(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  buildDatePicker(birthDateController),
+                ]),
+          );
+        }));
   }
 
-  void goToChooseImage() async{
-        await Get.to(const ImageProfile());
+  Widget buildProfileWidget() {
+    return FutureBuilder(
+        future: FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.email)
+            .get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            Map<String, dynamic> data =
+                snapshot.data!.data() as Map<String, dynamic>;
+            String imagePath = data["profile_image"];
+            return ProfileWidget(
+                imagePath: imagePath, onClicked: goToChooseImage, isEdit: true);
+          } else {
+            return const Text('loading..');
+          }
+        });
+  }
+
+  void goToChooseImage() async {
+    await Get.to(const ImageProfile());
   }
 
   Widget buildDatePicker(TextEditingController birthDateController) {
@@ -171,6 +196,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       setState(() {
         birthDateController.text = picked.toString().split(" ")[0];
       });
+      updateBirthDate();
     }
   }
 
