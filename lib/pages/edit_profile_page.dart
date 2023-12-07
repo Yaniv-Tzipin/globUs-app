@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_date_picker.dart';
 import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
@@ -104,7 +103,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   void goToChooseImage() async{
-        await Get.to(ImageProfile());
+        await Get.to(const ImageProfile());
   }
 
   Widget buildDatePicker(TextEditingController birthDateController) {
@@ -153,7 +152,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       UserQueries.usersTagsToString.add(tag);
       tagsCounter.increment();
     }
-    await Get.to(MyTags());
+    await Get.to(const MyTags());
     for (Chip tagChip in tagsCounter.chosenTags) {
       Text txt = tagChip.label as Text;
       if (!widget.stringTags.contains(txt.data.toString())) {
