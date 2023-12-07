@@ -90,7 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  buildProfileWidget(),
+                  buildProfileWidget() ,
                   const SizedBox(
                     height: 20,
                   ),
