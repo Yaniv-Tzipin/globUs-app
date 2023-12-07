@@ -39,7 +39,7 @@ class _MyTagsGridState extends State<MyTagsGrid> {
           padding: const EdgeInsets.all(10.0),
           child: Container(
             decoration: BoxDecoration(
-                border: Border.all(color: my_colors.toolBarColor),
+                border: Border.all(color:my_colors.lightGrey),
                 borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),

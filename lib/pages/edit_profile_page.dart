@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:myfirstapp/components/my_date_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
@@ -31,9 +31,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final birthDateController = TextEditingController();
 
   void updateDB() async {
-    Map<String, TextEditingController> controllers = {
-      "bio": bioController
-    };
+    Map<String, TextEditingController> controllers = {"bio": bioController};
     for (MapEntry<String, TextEditingController> entry in controllers.entries) {
       TextEditingController controller = entry.value;
       if (controller.text.isNotEmpty) {
@@ -43,11 +41,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
             .update({entry.key: controller.text});
       }
     }
-    if(birthDateController.text.isNotEmpty){
+    if (birthDateController.text.isNotEmpty) {
       FirebaseFirestore.instance
-            .collection('users')
-            .doc(currentUser.email)
-            .update({"birth_date": parseStringToTimestamp(birthDateController.text)});
+          .collection('users')
+          .doc(currentUser.email)
+          .update(
+              {"birth_date": parseStringToTimestamp(birthDateController.text)});
     }
 
     //todo: once Save is pressed, reload profile page automatically
@@ -97,17 +96,80 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             const SizedBox(height: 30),
             buildMyTags(),
+            const SizedBox(
+              height: 20,
+            ),
             buildDatePicker(birthDateController),
           ]),
     );
   }
 
-  void goToChooseImage() async{
-        await Get.to(const ImageProfile());
+  void goToChooseImage() async {
+    await Get.to(const ImageProfile());
   }
 
   Widget buildDatePicker(TextEditingController birthDateController) {
-    return MyDatePicker(dateController: birthDateController);
+    return FutureBuilder(
+        future: FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.email)
+            .get(),
+        builder:
+            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Text("Something went wrong");
+          }
+
+          if (snapshot.hasData && !snapshot.data!.exists) {
+            return Text(
+                "Document does not exist for email: ${currentUser.email}");
+          }
+
+          if (snapshot.connectionState == ConnectionState.done) {
+            Map<String, dynamic> data =
+                snapshot.data!.data() as Map<String, dynamic>;
+            String birthDate =
+                DateFormat.yMMMd().format(data["birth_date"].toDate());
+
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      "Birth date",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      birthDate,
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    IconButton(onPressed: _selectDate, icon: Icon(Icons.edit))
+                  ],
+                ),
+                // MyDatePicker(dateController: birthDateController)
+              ],
+            );
+          }
+          return Container();
+        });
+  }
+
+  Future<void> _selectDate() async {
+    DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime(2006),
+        firstDate: DateTime(1925),
+        lastDate: DateTime(2006));
+
+    if (picked != null) {
+      setState(() {
+        birthDateController.text = picked.toString().split(" ")[0];
+      });
+    }
   }
 
   Widget buildMyTags() {
