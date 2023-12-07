@@ -17,14 +17,14 @@ class MatchesService {
   late int ageDiff;
   late int countryCoeff;
   late double rank; // will hold the rank of the current potential match
-  late num distance;
+  late dynamic distance;
   num distancWeight;
   num tagsWeight;
   num originCountryWeight;
   num ageWeight;
   num swipeWeight;
 
-// will hold the emails of the potential matches
+  // will hold the emails of the potential matches
   late List<dynamic> potentialMatchesEmails;
   late List<dynamic> currentUserMatches;
   late List<dynamic> currentUserSwipedRight;
@@ -75,7 +75,6 @@ class MatchesService {
 // will hold the potential match fields
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     UserProfile potentialMatch = UserProfile(data);
-
     potentialMatch.originCountry == currentUser.originCountry
         ? countryCoeff = 1
         : countryCoeff = 0;
@@ -83,28 +82,22 @@ class MatchesService {
         potentialMatch.swipedLeft, potentialMatch.swipedRight);
     sharedTags = sharedTagsAmount(potentialMatch.tags);
     ageDiff = getAgeDiff(potentialMatch.age);
-    distance =
-        calcDistance(potentialMatch.latitude, potentialMatch.longitude, true);
+    distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
     rank = getFinalRank();
 
 // updating the potential matches cards list
     cards.add(MyMatchCard(
         cardRanking: rank,
         userEmail: potentialMatch.email,
-        distance: calcDistance(
-            potentialMatch.latitude, potentialMatch.longitude, false)));
+        distance: distance));
   }
 
-  dynamic calcDistance(
-      String potentialMatchLat, String potentialMatchLong, bool numericRes) {
+  dynamic calcDistance(String potentialMatchLat, String potentialMatchLong) {
     double distanceInMeters;
     if (potentialMatchLat == "" ||
         potentialMatchLong == "" ||
         currentUser.latitude == "" ||
         currentUser.longitude == "") {
-      if (numericRes) {
-        return 0;
-      }
       return "";
     } else {
       try {
@@ -115,7 +108,7 @@ class MatchesService {
             double.parse(currentUser.longitude));
       } catch (e) {
         print(e);
-        return 0;
+        return "";
       }
       return distanceInMeters / 1000;
     }
@@ -158,8 +151,11 @@ class MatchesService {
   }
 
   double getFinalRank() {
+    num distanceInfluence = distance == ""
+        ? 0
+        : ((distancWeight - distance * (distancWeight / 20000)));
     return (tagsWeight / 10) * sharedTags +
-        (distancWeight - distance * (distancWeight / 20000)) +
+        distanceInfluence +
         (ageWeight - ageDiff * (ageWeight / 81)) +
         countryCoeff * originCountryWeight +
         swipingScore;

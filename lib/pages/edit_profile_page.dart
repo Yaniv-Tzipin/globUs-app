@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:myfirstapp/components/my_button.dart';
+import 'package:myfirstapp/components/my_date_picker.dart';
 import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
 import 'package:myfirstapp/globals.dart';
+import 'package:myfirstapp/pages/choose_profile_image_page.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/home_page.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
+import 'package:myfirstapp/services/helpers.dart';
 import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:provider/provider.dart';
 
@@ -26,9 +28,12 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final usernameController = TextEditingController();
   final bioController = TextEditingController();
+  final birthDateController = TextEditingController();
 
   void updateDB() async {
-    Map<String, TextEditingController> controllers = {"bio": bioController};
+    Map<String, TextEditingController> controllers = {
+      "bio": bioController
+    };
     for (MapEntry<String, TextEditingController> entry in controllers.entries) {
       TextEditingController controller = entry.value;
       if (controller.text.isNotEmpty) {
@@ -37,6 +42,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
             .doc(currentUser.email)
             .update({entry.key: controller.text});
       }
+    }
+    if(birthDateController.text.isNotEmpty){
+      FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.email)
+            .update({"birth_date": parseStringToTimestamp(birthDateController.text)});
     }
 
     //todo: once Save is pressed, reload profile page automatically
@@ -51,6 +62,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void appBarOnPressed() {
     updateTagsInDB(widget.stringTags);
+    updateDB();
     Get.to(HomePage());
   }
 
@@ -72,7 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           children: [
             ProfileWidget(
                 imagePath: currentUser.profileImagePath,
-                onClicked: () async {},
+                onClicked: goToChooseImage,
                 isEdit: true),
             const SizedBox(
               height: 20,
@@ -85,11 +97,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             const SizedBox(height: 30),
             buildMyTags(),
-            MyButton(onTap: updateDB, text: 'Save'),
+            buildDatePicker(birthDateController),
           ]),
     );
   }
 
+  void goToChooseImage() async{
+        await Get.to(const ImageProfile());
+  }
+
+  Widget buildDatePicker(TextEditingController birthDateController) {
+    return MyDatePicker(dateController: birthDateController);
+  }
 
   Widget buildMyTags() {
     List<InputChip> myTags = currentUser.tags
@@ -133,7 +152,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       UserQueries.usersTagsToString.add(tag);
       tagsCounter.increment();
     }
-    await Get.to(MyTags());
+    await Get.to(const MyTags());
     for (Chip tagChip in tagsCounter.chosenTags) {
       Text txt = tagChip.label as Text;
       if (!widget.stringTags.contains(txt.data.toString())) {
