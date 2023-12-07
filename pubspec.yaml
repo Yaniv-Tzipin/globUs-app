@@ -50,6 +50,7 @@ dependencies:
   shadow_overlay: ^1.0.5
   geolocator: ^10.1.0
   font_awesome_flutter: ^10.6.0
+  intl: ^0.18.1
   
 
 dev_dependencies:
