@@ -1,16 +1,15 @@
-
 import "package:flutter/material.dart";
 import "package:myfirstapp/components/my_colors.dart" as my_colors;
 
 class MyTagsGrid extends StatefulWidget {
-  final String tagsTheme;
+  final String? tagsTheme;
   final Icon icon;
-  
   final List<Widget> listOfTags;
-   const MyTagsGrid({super.key,
-   required this.tagsTheme,
-  required this.icon,
-  required this.listOfTags
+  const MyTagsGrid({
+    super.key,
+    this.tagsTheme,
+    required this.icon,
+    required this.listOfTags,
   });
 
   @override
@@ -19,23 +18,29 @@ class MyTagsGrid extends StatefulWidget {
 
 class _MyTagsGridState extends State<MyTagsGrid> {
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
+    bool isWithHeader = (widget.tagsTheme != null) ? true : false;
     return Column(
       children: [
-         Row(
-           children: [
-            const SizedBox(width: 20),
-            widget.icon,
-            const SizedBox(width: 10,),
-             _titleContainer(widget.tagsTheme),
-           ],
-         ),
+        Visibility(
+          visible: isWithHeader,
+          child: Row(
+            children: [
+              const SizedBox(width: 20),
+              widget.icon,
+              const SizedBox(
+                width: 10,
+              ),
+              _titleContainer(widget.tagsTheme),
+            ],
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: my_colors.toolBarColor),
-            borderRadius: BorderRadius.circular(8)),
+                border: Border.all(color: my_colors.toolBarColor),
+                borderRadius: BorderRadius.circular(8)),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Align(
@@ -52,15 +57,13 @@ class _MyTagsGridState extends State<MyTagsGrid> {
         ),
       ],
     );
-
   }
 
-  Widget _titleContainer(string ){
-    return Text(widget.tagsTheme,
-    style: TextStyle(
-      fontWeight: FontWeight.bold,
-      color: my_colors.darkGrayFont
-    ),
+  Widget _titleContainer(string) {
+    return Text(
+      widget.tagsTheme ?? '',
+      style:
+          TextStyle(fontWeight: FontWeight.bold, color: my_colors.darkGrayFont),
     );
   }
 }

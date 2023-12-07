@@ -79,7 +79,6 @@ class _CardContentState extends State<CardContent> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(4),
       ),
       child: SingleChildScrollView(
@@ -282,9 +281,9 @@ class _CardContentState extends State<CardContent> {
         leading: userImageIcon,
         contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Colors.white, width: 0.3),
+          side: BorderSide(color:Color.fromARGB(255, 203, 228, 204), width: 0.3),
         ),
-        tileColor: Colors.white,
+        tileColor: const Color.fromARGB(255, 203, 228, 204),
 // show endorsement writer username
         title: Row(children: [
           Text(endorsement['writerUsername']),
