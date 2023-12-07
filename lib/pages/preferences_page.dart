@@ -44,7 +44,7 @@ class _PreferencesPageState extends State<PreferencesPage> {
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 116, 114, 114)),
+                      color:Color.fromARGB(255, 58, 58, 58)),
                 ),
               ),
               body: Column(
