@@ -63,6 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void appBarOnPressed() {
     updateTagsInDB(widget.stringTags);
+    updateDB();
     Get.to(HomePage());
   }
 
@@ -98,7 +99,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             const SizedBox(height: 30),
             buildMyTags(),
             buildDatePicker(birthDateController),
-            MyButton(onTap: updateDB, text: 'Save'),
           ]),
     );
   }
