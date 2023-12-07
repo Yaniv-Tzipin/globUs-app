@@ -189,15 +189,21 @@ class MyTag extends StatefulWidget {
 }
 
 class _MyTagState extends State<MyTag> {
-  bool isSelected = false;
   bool ableToAddTag() {
     return widget.tagsCounter.count != 10;
+  }
+  bool isSelected(){
+    try{
+      return widget.tagsCounter.isPressed(widget);
+    } 
+    catch(e){
+      return false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    isSelected = widget.tagsCounter.isPressed(widget);
-
+   
     return InputChip(
         label: Text(widget.text),
 
@@ -205,7 +211,6 @@ class _MyTagState extends State<MyTag> {
         onSelected: (bool newBool) {
           if (!widget.tagsCounter.isPressed(widget)) {
             if (ableToAddTag()) {
-              isSelected = !isSelected;
               widget.tagsCounter.increment();
               widget.tagsCounter.addTagToPressed(widget);
 
@@ -216,7 +221,8 @@ class _MyTagState extends State<MyTag> {
               ));
             }
           } else {
-            isSelected = !isSelected;
+            print('hi');
+            print(isSelected);
             widget.tagsCounter.decrement();
 
             //converting the tag to a chip that can't be pressed and is removed from the
@@ -226,8 +232,11 @@ class _MyTagState extends State<MyTag> {
             ));
             widget.tagsCounter.removeTagFromPressed(widget);
           }
+          setState(() {
+            
+          });
         },
-        selected: isSelected,
+        selected: isSelected(),
         selectedColor: my_colors.selectedTagColor);
   }
 }
