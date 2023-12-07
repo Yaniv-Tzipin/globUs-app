@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 import 'package:myfirstapp/components/my_button.dart';
 import 'package:myfirstapp/components/my_date_picker.dart';
+import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
@@ -12,6 +13,7 @@ import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/home_page.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
 import 'package:myfirstapp/services/helpers.dart';
+import 'package:myfirstapp/queries/users_quries.dart';
 import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -110,10 +112,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Widget buildMyTags() {
-    final tagsCounter = Provider.of<MyTagsProvider>(context);
-    List<MyTag> myTags = currentUser.tags
-        .map((x) => MyTag(tagsCounter: tagsCounter, text: x))
+    List<InputChip> myTags = currentUser.tags
+        .map((x) => InputChip(
+              label: Text(x),
+              selected: true,
+              selectedColor: selectedTagColor,
+              labelStyle: const TextStyle(color: Colors.black),
+              elevation: 0,
+            ))
         .toList();
+
     return Column(
       children: [
         Row(
@@ -134,15 +142,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void goToChooseTags() async {
     var tagsCounter = Provider.of<MyTagsProvider>(context, listen: false);
+    tagsCounter.nullifyCount();
+    tagsCounter.chosenTags = [];
+    tagsCounter.pressedTags = [];
     for (String tag in currentUser.tags) {
       tagsCounter.addTagToChosen(Chip(
         label: Text(tag),
       ));
+      tagsCounter.addTagToPressed(MyTag(tagsCounter: tagsCounter, text: tag));
+      UserQueries.usersTagsToString.add(tag);
+      tagsCounter.increment();
     }
     await Get.to(MyTags());
     for (Chip tagChip in tagsCounter.chosenTags) {
       Text txt = tagChip.label as Text;
-      widget.stringTags.add(txt.data.toString());
+      if (!widget.stringTags.contains(txt.data.toString())) {
+        widget.stringTags.add(txt.data.toString());
+      }
+      print(txt.data.toString());
     }
     // updateTagsInDB(stringTags);
   }

@@ -10,9 +10,13 @@ import 'package:shadow_overlay/shadow_overlay.dart';
 class MyMatchCard extends StatefulWidget implements Comparable {
   final double cardRanking;
   final String userEmail;
+  final dynamic distance;
 
   const MyMatchCard(
-      {super.key, required this.cardRanking, required this.userEmail});
+      {super.key,
+      required this.cardRanking,
+      required this.userEmail,
+      required this.distance});
 
   @override
   State<MyMatchCard> createState() => _MyMatchCardState();
@@ -44,7 +48,10 @@ class _MyMatchCardState extends State<MyMatchCard> {
             Map<String, dynamic> data =
                 snapshot.data!.data() as Map<String, dynamic>;
             currentUser = UserProfile(data);
-            return CardContent(currentUser: currentUser);
+            return CardContent(
+              currentUser: currentUser,
+              distance: widget.distance,
+            );
           }
           return Container();
         });
@@ -52,8 +59,10 @@ class _MyMatchCardState extends State<MyMatchCard> {
 }
 
 class CardContent extends StatefulWidget {
+  final dynamic distance;
   final UserProfile currentUser;
-  const CardContent({super.key, required this.currentUser});
+  const CardContent(
+      {super.key, required this.currentUser, required this.distance});
 
   @override
   State<CardContent> createState() => _CardContentState();
@@ -61,12 +70,15 @@ class CardContent extends StatefulWidget {
 
 class _CardContentState extends State<CardContent> {
   List<dynamic> potentialPartnerTags = currentUser.tags;
+
   @override
   Widget build(BuildContext context) {
+    // when both the user and the user appearing on the current card allow location services
+    // it will show the distance between them, otherwise it won't show anything
+    dynamic cuurentCardKmAway = widget.distance == "" ? "" : ', ${widget.distance.toInt().toString()} km away';
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black),
         borderRadius: BorderRadius.circular(4),
       ),
       child: SingleChildScrollView(
@@ -82,7 +94,7 @@ class _CardContentState extends State<CardContent> {
             Align(
               alignment: Alignment.topCenter,
               child: Text(
-                '${widget.currentUser.username}, ${widget.currentUser.age}',
+                '${widget.currentUser.username}, ${widget.currentUser.age} $cuurentCardKmAway',
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
               ),
@@ -269,9 +281,9 @@ class _CardContentState extends State<CardContent> {
         leading: userImageIcon,
         contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
         shape: const RoundedRectangleBorder(
-          side: BorderSide(color: Colors.white, width: 0.3),
+          side: BorderSide(color:Color.fromARGB(255, 203, 228, 204), width: 0.3),
         ),
-        tileColor: Colors.white,
+        tileColor: const Color.fromARGB(255, 203, 228, 204),
 // show endorsement writer username
         title: Row(children: [
           Text(endorsement['writerUsername']),

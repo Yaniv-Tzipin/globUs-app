@@ -17,7 +17,7 @@ class MatchesService {
   late int ageDiff;
   late int countryCoeff;
   late double rank; // will hold the rank of the current potential match
-  late double distance;
+  late num distance;
   num distancWeight;
   num tagsWeight;
   num originCountryWeight;
@@ -40,7 +40,7 @@ class MatchesService {
       this.ageWeight = 10,
       this.swipeWeight = 3});
 
- void scalePreferences(Map<String, dynamic> userPreferences) {
+  void scalePreferences(Map<String, dynamic> userPreferences) {
 // will hold the sum of all rangeSliders values
     num sum = 0;
     for (String key in userPreferences.keys) {
@@ -75,7 +75,6 @@ class MatchesService {
 // will hold the potential match fields
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
     UserProfile potentialMatch = UserProfile(data);
-    print(potentialMatch.email);
 
     potentialMatch.originCountry == currentUser.originCountry
         ? countryCoeff = 1
@@ -84,24 +83,31 @@ class MatchesService {
         potentialMatch.swipedLeft, potentialMatch.swipedRight);
     sharedTags = sharedTagsAmount(potentialMatch.tags);
     ageDiff = getAgeDiff(potentialMatch.age);
-distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
+    distance =
+        calcDistance(potentialMatch.latitude, potentialMatch.longitude, true);
     rank = getFinalRank();
-    
+
 // updating the potential matches cards list
-    cards.add(MyMatchCard(cardRanking: rank, userEmail: potentialMatch.email));
+    cards.add(MyMatchCard(
+        cardRanking: rank,
+        userEmail: potentialMatch.email,
+        distance: calcDistance(
+            potentialMatch.latitude, potentialMatch.longitude, false)));
   }
 
-
-  double calcDistance(String potentialMatchLat, String potentialMatchLong) {
+  dynamic calcDistance(
+      String potentialMatchLat, String potentialMatchLong, bool numericRes) {
     double distanceInMeters;
     if (potentialMatchLat == "" ||
         potentialMatchLong == "" ||
         currentUser.latitude == "" ||
         currentUser.longitude == "") {
-      return 0;
+      if (numericRes) {
+        return 0;
+      }
+      return "";
     } else {
       try {
-
         distanceInMeters = GeolocatorPlatform.instance.distanceBetween(
             double.parse(potentialMatchLat),
             double.parse(potentialMatchLong),
@@ -162,8 +168,9 @@ distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
 //get potential matches
   void loadPotenitalMatches(
       AsyncSnapshot<dynamic> snapshot1, AsyncSnapshot<dynamic> snapshot2) {
-    
     try {
+      // setting user customed weights if they exist
+      // otherwise using the default weights
       setCustomedWeights(snapshot2);
       cards = [];
       potentialMatchesEmails = [];
@@ -172,11 +179,8 @@ distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
       currentUserSwipedLeft = [];
 // retrieving the relevant data regarding current user
       currentUserMatches = snapshot2.data!.get('matches');
-      // print(currentUserMatches.toString());
       currentUserSwipedRight = snapshot2.data!.get('swipedRight');
-      // print(currentUserSwipedRight.toString());
       currentUserSwipedLeft = snapshot2.data!.get('swipedLeft');
-      // print(currentUserSwipedLeft.toString());
 // looping through all existing users and adding just
 // the potential matches to the list
       for (DocumentSnapshot doc in snapshot1.data!.docs) {
@@ -223,8 +227,12 @@ distance = calcDistance(potentialMatch.latitude, potentialMatch.longitude);
         //create a chat room
         String chatRoomId =
             _chatService.getChatRoomId(currentUserEmail, cardsOwnerEmail);
-        await _chatService.createANewChatRoom(chatRoomId, cardsOwnerEmail,
-            secondUsername, currentUserEmail, _firebaseAuth.currentUser?.email ?? "");
+        await _chatService.createANewChatRoom(
+            chatRoomId,
+            cardsOwnerEmail,
+            secondUsername,
+            currentUserEmail,
+            _firebaseAuth.currentUser?.email ?? "");
         return true;
       } else {
         return false;

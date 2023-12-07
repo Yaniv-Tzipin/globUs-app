@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:myfirstapp/components/my_colors.dart';
 import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/globals.dart';
@@ -83,6 +84,7 @@ class _ValidProfilePageState extends State<ValidProfilePage> {
           SizedBox(height: 30),
           buildAbout(currentUser.bio),
           SizedBox(height: 30),
+          
           buildMyTags()
         ],
       ),
@@ -90,9 +92,8 @@ class _ValidProfilePageState extends State<ValidProfilePage> {
   }
 
   Widget buildMyTags() {
-    final tagsCounter = Provider.of<MyTagsProvider>(context);
-    List<MyTag> myTags = currentUser.tags
-        .map((x) => MyTag(tagsCounter: tagsCounter, text: x))
+    List<InputChip> myTags = currentUser.tags
+        .map((x) => InputChip(label: Text(x),selected: true, selectedColor: selectedTagColor,labelStyle: const TextStyle(color: Colors.black),elevation: 0,))
         .toList();
 
    return
@@ -121,19 +122,23 @@ class _ValidProfilePageState extends State<ValidProfilePage> {
         ),
       );
 
-  Widget buildUserBasicData() => Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Text(
-              "${currentUser.username}, ${currentUser.age}",
-              style: const TextStyle(fontSize: 30),
+  Widget buildUserBasicData() => Flexible(
+    child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                overflow:TextOverflow.fade,
+                "${currentUser.username}, ${currentUser.age}",
+                style: const TextStyle(fontSize: 23),
+              ),
             ),
-          ),
-          Text(
-            currentUser.originCountry,
-            style: const TextStyle(fontSize: 18, color: Colors.grey),
-          )
-        ],
-      );
+            Text(
+              overflow:TextOverflow.fade,
+              currentUser.originCountry,
+              style: const TextStyle(fontSize: 18, color: Colors.grey),
+            )
+          ],
+        ),
+  );
 }
