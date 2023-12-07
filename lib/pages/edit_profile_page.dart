@@ -7,6 +7,7 @@ import 'package:myfirstapp/components/my_tags_grid.dart';
 import 'package:myfirstapp/components/profile_widget.dart';
 import 'package:myfirstapp/components/text_field_with_title.dart';
 import 'package:myfirstapp/globals.dart';
+import 'package:myfirstapp/pages/choose_profile_image_page.dart';
 import 'package:myfirstapp/pages/choose_tags_page.dart';
 import 'package:myfirstapp/pages/home_page.dart';
 import 'package:myfirstapp/providers/my_tags_provider.dart';
@@ -81,7 +82,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           children: [
             ProfileWidget(
                 imagePath: currentUser.profileImagePath,
-                onClicked: () async {},
+                onClicked: goToChooseImage,
                 isEdit: true),
             const SizedBox(
               height: 20,
@@ -98,6 +99,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             MyButton(onTap: updateDB, text: 'Save'),
           ]),
     );
+  }
+
+  void goToChooseImage() async{
+        await Get.to(ImageProfile());
   }
 
   Widget buildDatePicker(TextEditingController birthDateController) {
