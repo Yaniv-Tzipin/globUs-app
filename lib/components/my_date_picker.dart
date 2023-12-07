@@ -28,7 +28,7 @@ class _MyDatePickerState extends State<MyDatePicker> {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      onPressed: _selectDate,
+      onPressed: (){},
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: TextField(
@@ -49,6 +49,7 @@ class _MyDatePickerState extends State<MyDatePicker> {
                 borderSide: BorderSide(color: Colors.white),
               )),
           readOnly: true,
+          onTap: _selectDate,
         ),
       ),
     );
