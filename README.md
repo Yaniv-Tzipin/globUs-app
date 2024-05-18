@@ -6,7 +6,9 @@ Whether you’re on a business trip with some spare time for hiking or a solo tr
 Must-have functionalities:
 
 Chat — Given the social nature of our app, incorporating a means of communication between users was necessary. Therefore, we had to establish chat service.
+
 Profile — To facilitate the seek for ideal travel companions, we enabled users to create informative profiles that showcase their personalities effectively. Each profile includes essential details such as a profile image, bio, location, and age. Additionally, during the registration process, users have the option to choose custom tags that reflect their preferences and interests related to travel.
+
 Matching board — we’re far away from being pioneers with the matching concept, but I will elaborate a little bit more on a related mechanism we implemented in this feature later on. 
 
 Later on, we delved into finer details, putting ourselves in the user’s position and pondering what concerns or needs could arise while using GlobUs. Here are some of the primary ideas that emerged from our brainstorming:
